@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  firstName  String
+  lastName   String
+  wpNumber   String   @unique
+  email      String   @unique
+  password   String
+  profileIds String[] @db.ObjectId
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Admin {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  firstName String
+  lastName  String
+  email     String
+  password  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ProfileType {
+  PUBLIC
+  PRIVATE
+}
+
+model Profile {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  type          ProfileType
+  contactPerson Json
+  details       Json
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
