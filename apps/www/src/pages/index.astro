@@ -1,11 +1,235 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import Layout from "@layouts/Layout.astro";
+import MetaTags from "@seo/meta.tags.astro";
+import { Icon } from "astro-icon/components";
 ---
 
 <Layout>
-	<Welcome />
+  <MetaTags />
+  <!-- Hero section -->
+  <section
+    class="bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10"
+  >
+    <div class="text-center">
+      <div>
+        <!-- Badge -->
+        <div class="badge badge-primary badge-lg px-6 py-3 mt-10 mb-20"
+          >✨ Two Types of QR Codes Available</div
+        >
+
+        <!-- Main Headline -->
+        <h1 class="text-4xl md:text-6xl font-bold mb-2">
+          Create
+          <span
+            class="text-primary bg-gradient-to-r from-primary to-secondary bg-clip-text"
+          >
+            Smart QR Codes
+          </span>
+          <br />for Every Need
+        </h1>
+
+        <!-- Subtitle -->
+        <p class="md:text-lg text-base-content/80 max-w-2xl px-2 mx-auto">
+          Generate profile QR codes to share your information instantly, or
+          create emergency QR codes with direct admin contact for urgent
+          situations.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div
+          class="flex flex-col sm:flex-row gap-4 justify-center items-center mt-14 px-2 md:px-16"
+        >
+          <button class="btn btn-primary w-full max-w-xs">
+            <Icon name="lucide:user" size={24} />
+            <span>Create Profile QR</span>
+          </button>
+          <button class="btn btn-error w-full max-w-xs">
+            <Icon name="lucide:shield-alert" size={24} />
+            <span> Create Emergency QR </span>
+          </button>
+        </div>
+
+        <!-- Trust Signals -->
+        <div class="stats bg-base-100/50 backdrop-blur-sm my-10">
+          <div class="stat">
+            <div class="stat-figure text-primary">
+              <Icon name="lucide:shield-check" class="w-6 h-6 sm:w-8 sm:h-8" />
+            </div>
+            <div class="stat-title text-xs sm:text-sm">Security</div>
+            <div class="stat-value text-primary text-lg sm:text-2xl lg:text-3xl"
+              >Secured</div
+            >
+            <div class="stat-desc text-xs hidden sm:block"
+              >End-to-end encrypted</div
+            >
+          </div>
+          <div class="stat">
+            <div class="stat-figure text-secondary">
+              <Icon name="lucide:clock" class="w-6 h-6 sm:w-8 sm:h-8" />
+            </div>
+            <div class="stat-title text-xs sm:text-sm">Support</div>
+            <div
+              class="stat-value text-secondary text-lg sm:text-2xl lg:text-3xl"
+              >24/7</div
+            >
+            <div class="stat-desc text-xs hidden sm:block">Always available</div
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr />
+
+  <section class="py-8 bg-base-100">
+    <div class="container mx-auto px-4 max-w-6xl">
+      <!-- Section Header -->
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+          Two Powerful QR Code Types
+        </h2>
+        <p class="text-lg md:text-xl text-base-content/70 max-w-3xl mx-auto">
+          Choose the perfect QR code for your needs. Share your profile
+          instantly or ensure emergency help is always available.
+        </p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-8 lg:gap-12">
+        <!-- Profile QR Code Feature -->
+        <div
+          class="card bg-gradient-to-br from-primary/5 to-secondary/10 border border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 group"
+        >
+          <div class="card-body p-6 lg:p-8">
+            <!-- Icon -->
+            <div
+              class="flex items-center justify-center w-16 h-16 bg-primary/10 rounded-2xl mb-6 group-hover:bg-primary/20 transition-colors duration-300"
+            >
+              <Icon name="lucide:user" class="w-8 h-8 text-primary" />
+            </div>
+
+            <!-- Content -->
+            <h3 class="text-2xl lg:text-3xl font-bold text-primary mb-4">
+              Profile QR Code
+            </h3>
+            <p class="text-base-content/80 mb-6 leading-relaxed">
+              Create a public QR code that instantly shares your profile
+              information when scanned. Perfect for networking, business cards,
+              and social connections.
+            </p>
+
+            <!-- Features List -->
+            <ul class="space-y-3 mb-8">
+              <li class="flex items-start gap-3">
+                <Icon
+                  name="lucide:check-circle"
+                  class="w-5 h-5 text-primary mt-0.5 flex-shrink-0"
+                />
+                <span class="text-sm lg:text-base">Instant profile sharing</span
+                >
+              </li>
+              <li class="flex items-start gap-3">
+                <Icon
+                  name="lucide:check-circle"
+                  class="w-5 h-5 text-primary mt-0.5 flex-shrink-0"
+                />
+                <span class="text-sm lg:text-base"
+                  >Customizable information</span
+                >
+              </li>
+              <li class="flex items-start gap-3">
+                <Icon
+                  name="lucide:check-circle"
+                  class="w-5 h-5 text-primary mt-0.5 flex-shrink-0"
+                />
+                <span class="text-sm lg:text-base">Professional networking</span
+                >
+              </li>
+              <li class="flex items-start gap-3">
+                <Icon
+                  name="lucide:check-circle"
+                  class="w-5 h-5 text-primary mt-0.5 flex-shrink-0"
+                />
+                <span class="text-sm lg:text-base">No app required to scan</span
+                >
+              </li>
+            </ul>
+
+            <!-- CTA Button -->
+            <button
+              class="btn btn-primary w-full group-hover:btn-secondary transition-colors duration-300"
+            >
+              <Icon name="lucide:plus" class="w-5 h-5 mr-2" />
+              Create Profile QR
+            </button>
+          </div>
+        </div>
+
+        <!-- Emergency QR Code Feature -->
+        <div
+          class="card bg-gradient-to-br from-error/5 to-warning/10 border border-error/20 shadow-lg hover:shadow-xl transition-all duration-300 group"
+        >
+          <div class="card-body p-6 lg:p-8">
+            <!-- Icon -->
+            <div
+              class="flex items-center justify-center w-16 h-16 bg-error/10 rounded-2xl mb-6 group-hover:bg-error/20 transition-colors duration-300"
+            >
+              <Icon name="lucide:shield-alert" class="w-8 h-8 text-error" />
+            </div>
+
+            <!-- Content -->
+            <h3 class="text-2xl lg:text-3xl font-bold text-error mb-4">
+              Emergency QR Code
+            </h3>
+            <p class="text-base-content/80 mb-6 leading-relaxed">
+              Generate an emergency contact QR code with a direct communication
+              button to reach admin instantly. Perfect for urgent situations and
+              safety measures.
+            </p>
+
+            <!-- Features List -->
+            <ul class="space-y-3 mb-8">
+              <li class="flex items-start gap-3">
+                <Icon
+                  name="lucide:check-circle"
+                  class="w-5 h-5 text-error mt-0.5 flex-shrink-0"
+                />
+                <span class="text-sm lg:text-base">Direct admin contact</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <Icon
+                  name="lucide:check-circle"
+                  class="w-5 h-5 text-error mt-0.5 flex-shrink-0"
+                />
+                <span class="text-sm lg:text-base"
+                  >One-click emergency trigger</span
+                >
+              </li>
+              <li class="flex items-start gap-3">
+                <Icon
+                  name="lucide:check-circle"
+                  class="w-5 h-5 text-error mt-0.5 flex-shrink-0"
+                />
+                <span class="text-sm lg:text-base">24/7 availability</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <Icon
+                  name="lucide:check-circle"
+                  class="w-5 h-5 text-error mt-0.5 flex-shrink-0"
+                />
+                <span class="text-sm lg:text-base">Secure communication</span>
+              </li>
+            </ul>
+
+            <!-- CTA Button -->
+            <button
+              class="btn btn-error w-full group-hover:btn-warning transition-colors duration-300"
+            >
+              <Icon name="lucide:zap" class="w-5 h-5 mr-2" />
+              Create Emergency QR
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 </Layout>

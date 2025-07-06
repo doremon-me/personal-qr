@@ -1,0 +1,64 @@
+---
+import { Icon } from "astro-icon/components";
+---
+
+<!-- Minimal Footer -->
+<footer class="bg-base-200/30 border-t border-base-300/20">
+  <div class="container mx-auto px-4 py-8">
+    <!-- Main Content -->
+    <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+      <!-- Brand -->
+      <div class="flex items-center gap-2">
+        <Icon name="heroicons:qr-code-solid" class="w-6 h-6 text-primary" />
+        <span class="text-lg font-bold">Personal QR</span>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="flex flex-wrap justify-center gap-6 text-sm">
+        <a
+          href="/about"
+          class="text-base-content/70 hover:text-primary transition-colors"
+        >
+          About
+        </a>
+        <a
+          href="/contact"
+          class="text-base-content/70 hover:text-primary transition-colors"
+        >
+          Contact
+        </a>
+        <a
+          href="/help"
+          class="text-base-content/70 hover:text-primary transition-colors"
+        >
+          Help
+        </a>
+        <a
+          href="/privacy-policy"
+          class="text-base-content/70 hover:text-primary transition-colors"
+        >
+          Privacy Policy
+        </a>
+        <a
+          href="/terms-conditions"
+          class="text-base-content/70 hover:text-primary transition-colors"
+        >
+          Terms & Conditions
+        </a>
+      </nav>
+    </div>
+
+    <!-- Copyright -->
+    <div class="text-center mt-6 pt-6 border-t border-base-300/20">
+      <p class="text-sm text-base-content/60">
+        © 2025 Personal QR. All rights reserved. •
+        <a href="/privacy-policy" class="hover:text-primary transition-colors"
+          >Privacy</a
+        > •
+        <a href="/terms-conditions" class="hover:text-primary transition-colors"
+          >Terms</a
+        >
+      </p>
+    </div>
+  </div>
+</footer>

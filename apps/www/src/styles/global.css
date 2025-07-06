@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import "tailwindcss";
+
+@plugin "daisyui" {
+    themes: light --default, dark --prefersdark, cupcake;
+}
+
+@plugin "daisyui/theme" {
+    name: "cmyk";
+    default: false;
+    prefersdark: false;
+    color-scheme: "light";
+    --color-base-100: oklch(100% 0 0);
+    --color-base-200: oklch(95% 0 0);
+    --color-base-300: oklch(90% 0 0);
+    --color-base-content: oklch(20% 0 0);
+    --color-primary: oklch(54% 0.245 262.881);
+    --color-primary-content: oklch(98% 0 0);
+    --color-secondary: oklch(80% 0.105 251.813);
+    --color-secondary-content: oklch(14% 0.005 285.823);
+    --color-accent: oklch(92% 0.12 95.746);
+    --color-accent-content: oklch(13% 0.028 261.692);
+    --color-neutral: oklch(21.778% 0 0);
+    --color-neutral-content: oklch(84.355% 0 0);
+    --color-info: oklch(78% 0.154 211.53);
+    --color-info-content: oklch(98% 0.002 247.839);
+    --color-success: oklch(50% 0.118 165.612);
+    --color-success-content: oklch(97% 0.021 166.113);
+    --color-warning: oklch(76% 0.188 70.08);
+    --color-warning-content: oklch(14.247% 0.031 52.023);
+    --color-error: oklch(50% 0.213 27.518);
+    --color-error-content: oklch(98% 0.003 247.858);
+    --radius-selector: 0.5rem;
+    --radius-field: 0.25rem;
+    --radius-box: 1rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 0.5px;
+    --depth: 1;
+    --noise: 0;
+}
+
+* {
+    font-family: "Roboto", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-variation-settings: "wdth" 100;
+}
+
+.underline-effect {
+    text-decoration: none;
+    position: relative;
+}
+
+.underline-effect::before {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 0;   
+    height: 2px;
+    transition: all .5s ease;
+}
+
+.underline-effect:hover::before {
+    width: 100%;
+}

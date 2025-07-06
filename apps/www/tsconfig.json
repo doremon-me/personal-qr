@@ -1,5 +1,16 @@
 {
   "extends": "astro/tsconfigs/strict",
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"]
+  "exclude": ["dist"],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@seo/*": ["src/seo/*"],
+      "@layouts/*": ["src/layouts/*"],
+      "@styles/*": ["src/styles/*"],
+      "@ui/*": ["src/components/ui/*"],
+      "@const/*": ["src/components/const/*"],
+      "@shared/*": ["src/components/shared/*"]
+    }
+  }
 }

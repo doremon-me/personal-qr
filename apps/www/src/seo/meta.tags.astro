@@ -1,0 +1,137 @@
+---
+export interface Props {
+  title?: string;
+  description?: string;
+  keywords?: string;
+  image?: string;
+  url?: string;
+  type?: string;
+  author?: string;
+  siteName?: string;
+  twitterHandle?: string;
+}
+
+const {
+  title = "Personal QR - Create Profile & Emergency QR Codes",
+  description = "Generate two types of QR codes: Public profile QR codes for sharing your information, and Emergency QR codes with direct admin contact for urgent situations. Secure, fast, and reliable QR code generator.",
+  keywords = "QR code generator, profile QR code, emergency QR code, personal QR, digital profile, emergency contact, QR scanner, custom QR codes, safety QR, contact QR",
+  image = "/og-image.jpg",
+  url = Astro.url.href || "https://personalqr.com",
+  type = "website",
+  author = "Personal QR Team",
+  siteName = "Personal QR",
+  twitterHandle = "@personalqr",
+} = Astro.props;
+
+// const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+// const fullImageUrl = new URL(image, Astro.site);
+---
+
+<title>{title}</title>
+<meta name="title" content={title} />
+<meta name="description" content={description} />
+<meta name="keywords" content={keywords} />
+<meta name="author" content={author} />
+<meta name="robots" content="index, follow" />
+<meta name="language" content="English" />
+<meta name="revisit-after" content="7 days" />
+
+<!-- Product specific meta -->
+<meta name="application-name" content="Personal QR Code Generator" />
+<meta name="category" content="Productivity, Safety, Networking" />
+<meta name="coverage" content="Worldwide" />
+<meta name="distribution" content="Global" />
+<meta name="rating" content="General" />
+
+<!-- Canonical URL -->
+<!-- <link rel="canonical" href={canonicalURL} /> -->
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content={type} />
+<meta property="og:url" content={url} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<!-- <meta property="og:image" content={fullImageUrl} /> -->
+<meta property="og:image:alt" content="Personal QR - Profile and Emergency QR Code Generator" />
+<meta property="og:site_name" content={siteName} />
+<meta property="og:locale" content="en_US" />
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:url" content={url} />
+<meta property="twitter:title" content={title} />
+<meta property="twitter:description" content={description} />
+<!-- <meta property="twitter:image" content={fullImageUrl} /> -->
+<meta property="twitter:site" content={twitterHandle} />
+<meta property="twitter:creator" content={twitterHandle} />
+
+<!-- Additional SEO Meta Tags -->
+<meta name="theme-color" content="#3245ff" />
+<meta name="msapplication-TileColor" content="#3245ff" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content={siteName} />
+
+<!-- Preconnect to external domains for performance -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+<!-- JSON-LD Structured Data -->
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Personal QR Code Generator",
+    "applicationCategory": "ProductivityApplication",
+    "operatingSystem": "Web Browser",
+    "url": "{url}",
+    "description": "Create two types of QR codes: Public profile QR codes for sharing personal information, and Emergency QR codes with direct admin contact for urgent situations.",
+    "author": {
+      "@type": "Organization",
+      "name": "{author}"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "featureList": [
+      "Public Profile QR Code Generation",
+      "Emergency Contact QR Code Creation",
+      "Direct Admin Communication",
+      "Instant QR Code Scanning",
+      "Secure Profile Sharing",
+      "Emergency Response System"
+    ],
+    "screenshot": "{fullImageUrl}",
+    "softwareVersion": "1.0",
+    "datePublished": "2025-07-06"
+  }
+</script>
+
+<!-- Additional Structured Data for Product -->
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "Personal QR Code System",
+    "description": "Dual-purpose QR code generator for profile sharing and emergency contact",
+    "brand": {
+      "@type": "Brand",
+      "name": "Personal QR"
+    },
+    "category": "QR Code Generator",
+    "hasVariant": [
+      {
+        "@type": "ProductModel",
+        "name": "Public Profile QR Code",
+        "description": "Share your profile information when scanned by anyone"
+      },
+      {
+        "@type": "ProductModel", 
+        "name": "Emergency Contact QR Code",
+        "description": "Provides emergency contact page with direct admin communication button"
+      }
+    ]
+  }
+</script>
