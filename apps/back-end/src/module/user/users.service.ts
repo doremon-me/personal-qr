@@ -12,7 +12,7 @@ import { User } from 'generated/prisma';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) { }
 
   async findAll(quary: SearchAndPaginationDto) {
     const { search, page = 1, limit = 10, orderBy, orderDirection } = quary;
@@ -77,6 +77,30 @@ export class UsersService {
         });
         return user || null;
       }
+    } catch (error) {
+      throw new InternalServerErrorException('Unable to retrieve user');
+    }
+  }
+
+  async find(params: { id?: string; email?: string; phone?: string }) {
+    const { id, email, phone } = params;
+
+    if (!id && !email && !phone) {
+      throw new BadRequestException('No identifier provided');
+    }
+
+    try {
+      const user = await this.prismaService.user.findFirst({
+        where: {
+          isDeleted: false,
+          OR: [
+            { id: id },
+            { email: email },
+            { wpNumber: phone },
+          ],
+        },
+      });
+      return user || null;
     } catch (error) {
       throw new InternalServerErrorException('Unable to retrieve user');
     }
