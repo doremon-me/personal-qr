@@ -2,6 +2,8 @@ import { Expose } from 'class-transformer';
 
 export class UserSerializer {
   @Expose()
+  id: string;
+  @Expose()
   email: string;
   @Expose()
   firstName: string;
@@ -13,7 +15,12 @@ export class UserSerializer {
   wpNumber: string;
   @Expose()
   profileIds: string[];
-
+  @Expose()
+  isDeleted: string;
+  @Expose()
+  createdAt: Date;
+  @Expose()
+  deletedAt: Date;
   constructor(partial: Partial<UserSerializer>) {
     Object.assign(this, partial);
   }
