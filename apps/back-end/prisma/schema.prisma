@@ -12,12 +12,16 @@ model User {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   firstName  String
   lastName   String
-  wpNumber   String   @unique
-  email      String   @unique
+  wpNumber   String  
+  email      String  
   password   String
   profileIds String[] @db.ObjectId
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+
+  //  Soft delete 
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 }
 
 model Admin {
@@ -34,6 +38,7 @@ model Admin {
 enum ProfileType {
   PUBLIC
   PRIVATE
+  EMERGENCY
 }
 
 model Profile {
