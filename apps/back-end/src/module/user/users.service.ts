@@ -8,11 +8,10 @@ import { CreateUserDto } from './user.dto';
 import { SearchAndPaginationDto } from 'src/common/dtos/searchAndPage.dto';
 import { hashPassword } from 'src/common/utils/hash.util';
 import { updateUserDto } from './updateUser.dto';
-import { User } from 'generated/prisma';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
   async findAll(quary: SearchAndPaginationDto) {
     const { search, page = 1, limit = 10, orderBy, orderDirection } = quary;
@@ -51,37 +50,6 @@ export class UsersService {
     }
   }
 
-  async findUser(params: { id?: string; email?: string; phone?: string }) {
-    const { id, email, phone } = params;
-
-    if (!id && !email && !phone) {
-      throw new BadRequestException('No identifier provided');
-    }
-
-    try {
-      if (id) {
-        const user = await this.prismaService.user.findUnique({
-          where: { id: id },
-        });
-        return user || null;
-      }
-      if (email) {
-        const user = await this.prismaService.user.findUnique({
-          where: { email: email },
-        });
-        return user || null;
-      }
-      if (phone) {
-        const user = await this.prismaService.user.findUnique({
-          where: { wpNumber: phone },
-        });
-        return user || null;
-      }
-    } catch (error) {
-      throw new InternalServerErrorException('Unable to retrieve user');
-    }
-  }
-
   async find(params: { id?: string; email?: string; phone?: string }) {
     const { id, email, phone } = params;
 
@@ -89,29 +57,43 @@ export class UsersService {
       throw new BadRequestException('No identifier provided');
     }
 
+    const orConditions: any[] = [];
+
+    if (id && /^[a-f\d]{24}$/i.test(id)) {
+      orConditions.push({ id });
+    }
+
+    if (email) {
+      orConditions.push({ email });
+    }
+
+    if (phone) {
+      orConditions.push({ wpNumber: phone });
+    }
+
     try {
       const user = await this.prismaService.user.findFirst({
         where: {
           isDeleted: false,
-          OR: [
-            { id: id },
-            { email: email },
-            { wpNumber: phone },
-          ],
+          OR: orConditions,
         },
       });
+
       return user || null;
     } catch (error) {
-      throw new InternalServerErrorException('Unable to retrieve user');
+      throw new InternalServerErrorException({
+        message: 'Unable to retrieve user',
+        cause: error,
+        description: error?.message,
+      });
     }
   }
 
   async createUser(user: CreateUserDto) {
-    const existingUser = await this.prismaService.user.findFirst({
-      where: {
-        isDeleted: false,
-        email: user.email,
-      },
+
+    const existingUser = await this.find({
+      email: user.email,
+      phone: user.wpNumber,
     });
 
     if (existingUser) {

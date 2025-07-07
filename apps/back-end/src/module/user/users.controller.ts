@@ -1,5 +1,4 @@
 import {
-  BadGatewayException,
   Body,
   ClassSerializerInterceptor,
   Controller,
@@ -50,12 +49,17 @@ export class UsersController {
     });
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get('/search')
   async findUser(@Query('search') search: string) {
-    return await this.userService.findUser({
+    const users = await this.userService.find({
       id: search,
       email: search,
       phone: search,
+    });
+
+    return plainToInstance(UserSerializer, users, {
+      excludeExtraneousValues: true,
     });
   }
 
