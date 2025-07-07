@@ -1,0 +1,394 @@
+---
+import Layout from "@layouts/Layout.astro";
+import MetaTags from "@seo/meta.tags.astro";
+import { Icon } from "astro-icon/components";
+---
+
+<Layout>
+  <MetaTags
+    title="About Us - Personal QR"
+    description="Learn about Personal QR, our mission to make QR code generation simple and accessible for everyone. Discover our story and values."
+    keywords="about personal QR, QR code company, mission, vision, team"
+  />
+  <!-- Main Content -->
+  <main>
+    <!-- Hero Section -->
+    <section class="py-20 bg-gradient-to-br from-primary/10 to-secondary/10">
+      <div class="container mx-auto px-4 text-center max-w-4xl">
+        <h1 class="text-4xl md:text-6xl font-bold mb-6">
+          About
+          <span
+            class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-primary"
+          >
+            Personal QR
+          </span>
+        </h1>
+        <p class="text-xl md:text-2xl text-base-content/80 max-w-3xl mx-auto">
+          We're on a mission to make QR code generation simple, accessible, and
+          meaningful for everyone. From professional networking to emergency
+          safety, we've got you covered.
+        </p>
+      </div>
+    </section>
+
+    <!-- Our Story Section -->
+    <section class="py-20 bg-base-100">
+      <div class="container mx-auto px-4 max-w-6xl">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">Our Story</h2>
+            <div class="space-y-4 text-lg text-base-content/80">
+              <p>
+                Personal QR was born from a simple observation: QR codes were
+                everywhere, but creating meaningful, personal ones was
+                unnecessarily complicated and expensive.
+              </p>
+              <p>
+                We saw people struggling with complex QR generators, paying for
+                basic features, or settling for generic solutions that didn't
+                meet their specific needs. That's when we decided to build
+                something different.
+              </p>
+              <p>
+                Our platform focuses on two essential use cases: <strong
+                  class="text-primary">professional networking</strong
+                > through Profile QR codes and <strong class="text-error"
+                  >emergency safety</strong
+                > through Emergency QR codes with direct admin contact.
+              </p>
+              <p>
+                Today, thousands of users trust Personal QR for their networking
+                and safety needs, and we're just getting started.
+              </p>
+            </div>
+          </div>
+          <div class="bg-base-200/50 rounded-2xl p-8 text-center">
+            <div
+              class="w-32 h-32 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6"
+            >
+              <Icon
+                name="heroicons:light-bulb-solid"
+                class="w-16 h-16 text-primary"
+              />
+            </div>
+            <h3 class="text-2xl font-bold mb-4">The Idea</h3>
+            <p class="text-base-content/70">
+              "What if QR codes could be both professional and personal, serving
+              real-world needs without the complexity?"
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mission & Vision -->
+    <section class="py-20 bg-base-200/50">
+      <div class="container mx-auto px-4 max-w-6xl">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl md:text-4xl font-bold mb-4">Mission & Vision</h2>
+          <p class="text-xl text-base-content/70"
+            >What drives us and where we're heading</p
+          >
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8">
+          <!-- Mission -->
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body text-center">
+              <div
+                class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6"
+              >
+                <Icon
+                  name="heroicons:target-solid"
+                  class="w-8 h-8 text-primary"
+                />
+              </div>
+              <h3 class="text-2xl font-bold text-primary mb-4">Our Mission</h3>
+              <p class="text-base-content/80 leading-relaxed">
+                To democratize QR code technology by providing free, secure, and
+                user-friendly tools that serve real-world needs. We believe
+                everyone should have access to professional networking tools and
+                emergency safety features without barriers.
+              </p>
+            </div>
+          </div>
+
+          <!-- Vision -->
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body text-center">
+              <div
+                class="w-16 h-16 bg-secondary/10 rounded-2xl flex items-center justify-center mx-auto mb-6"
+              >
+                <Icon
+                  name="heroicons:eye-solid"
+                  class="w-8 h-8 text-secondary"
+                />
+              </div>
+              <h3 class="text-2xl font-bold text-secondary mb-4">Our Vision</h3>
+              <p class="text-base-content/80 leading-relaxed">
+                To become the go-to platform for personal QR codes globally. We
+                envision a world where sharing your professional information or
+                accessing emergency help is as simple as a quick scan.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Values -->
+    <section class="py-20 bg-base-100">
+      <div class="container mx-auto px-4 max-w-6xl">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl md:text-4xl font-bold mb-4">Our Values</h2>
+          <p class="text-xl text-base-content/70"
+            >The principles that guide everything we do</p
+          >
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <!-- Free Access -->
+          <div class="text-center">
+            <div
+              class="w-16 h-16 bg-success/10 rounded-2xl flex items-center justify-center mx-auto mb-4"
+            >
+              <Icon name="heroicons:gift-solid" class="w-8 h-8 text-success" />
+            </div>
+            <h3 class="text-xl font-bold mb-3">Free Access</h3>
+            <p class="text-sm text-base-content/70">
+              We believe essential tools should be free. No hidden fees, no
+              premium tiers for basic features.
+            </p>
+          </div>
+
+          <!-- Privacy First -->
+          <div class="text-center">
+            <div
+              class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4"
+            >
+              <Icon
+                name="heroicons:shield-check-solid"
+                class="w-8 h-8 text-primary"
+              />
+            </div>
+            <h3 class="text-xl font-bold mb-3">Privacy First</h3>
+            <p class="text-sm text-base-content/70">
+              Your data is yours. We protect your privacy and never sell your
+              information to third parties.
+            </p>
+          </div>
+
+          <!-- Simplicity -->
+          <div class="text-center">
+            <div
+              class="w-16 h-16 bg-secondary/10 rounded-2xl flex items-center justify-center mx-auto mb-4"
+            >
+              <Icon
+                name="heroicons:sparkles-solid"
+                class="w-8 h-8 text-secondary"
+              />
+            </div>
+            <h3 class="text-xl font-bold mb-3">Simplicity</h3>
+            <p class="text-sm text-base-content/70">
+              Complex technology should have simple interfaces. We make powerful
+              tools easy to use.
+            </p>
+          </div>
+
+          <!-- Reliability -->
+          <div class="text-center">
+            <div
+              class="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center mx-auto mb-4"
+            >
+              <Icon name="heroicons:bolt-solid" class="w-8 h-8 text-accent" />
+            </div>
+            <h3 class="text-xl font-bold mb-3">Reliability</h3>
+            <p class="text-sm text-base-content/70">
+              When you need us, we're there. 99.9% uptime and 24/7 emergency
+              support availability.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- What Makes Us Different -->
+    <section class="py-20 bg-base-200/50">
+      <div class="container mx-auto px-4 max-w-6xl">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl md:text-4xl font-bold mb-4"
+            >What Makes Us Different</h2
+          >
+          <p class="text-xl text-base-content/70"
+            >Why choose Personal QR over other solutions</p
+          >
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-8">
+          <!-- Focused Approach -->
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <div
+                class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4"
+              >
+                <Icon
+                  name="heroicons:target-solid"
+                  class="w-6 h-6 text-primary"
+                />
+              </div>
+              <h3 class="text-xl font-bold mb-3">Focused Approach</h3>
+              <p class="text-base-content/70">
+                While others try to do everything, we focus on two things
+                exceptionally well: professional networking and emergency
+                safety.
+              </p>
+            </div>
+          </div>
+
+          <!-- Emergency Innovation -->
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <div
+                class="w-12 h-12 bg-error/10 rounded-xl flex items-center justify-center mb-4"
+              >
+                <Icon
+                  name="heroicons:shield-exclamation-solid"
+                  class="w-6 h-6 text-error"
+                />
+              </div>
+              <h3 class="text-xl font-bold mb-3">Emergency Innovation</h3>
+              <p class="text-base-content/70">
+                We're the first to offer QR codes with direct admin contact for
+                emergencies, providing a crucial safety feature.
+              </p>
+            </div>
+          </div>
+
+          <!-- User-Centric Design -->
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <div
+                class="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center mb-4"
+              >
+                <Icon
+                  name="heroicons:heart-solid"
+                  class="w-6 h-6 text-secondary"
+                />
+              </div>
+              <h3 class="text-xl font-bold mb-3">User-Centric Design</h3>
+              <p class="text-base-content/70">
+                Every feature is designed with real user needs in mind, not what
+                looks impressive in a feature list.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-20 bg-base-100">
+      <div class="container mx-auto px-4 max-w-4xl">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl md:text-4xl font-bold mb-4"
+            >Personal QR by the Numbers</h2
+          >
+          <p class="text-xl text-base-content/70">Our impact in numbers</p>
+        </div>
+
+        <div
+          class="stats stats-vertical lg:stats-horizontal shadow bg-base-100 w-full"
+        >
+          <div class="stat">
+            <div class="stat-figure text-primary">
+              <Icon name="heroicons:users-solid" class="w-10 h-10" />
+            </div>
+            <div class="stat-title">Active Users</div>
+            <div class="stat-value text-primary">25,000+</div>
+            <div class="stat-desc">Growing every day</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-figure text-secondary">
+              <Icon name="heroicons:qr-code-solid" class="w-10 h-10" />
+            </div>
+            <div class="stat-title">QR Codes Generated</div>
+            <div class="stat-value text-secondary">150K+</div>
+            <div class="stat-desc">Since our launch</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-figure text-accent">
+              <Icon name="heroicons:globe-alt-solid" class="w-10 h-10" />
+            </div>
+            <div class="stat-title">Countries Served</div>
+            <div class="stat-value text-accent">50+</div>
+            <div class="stat-desc">Worldwide reach</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-figure text-success">
+              <Icon name="heroicons:clock-solid" class="w-10 h-10" />
+            </div>
+            <div class="stat-title">Uptime</div>
+            <div class="stat-value text-success">99.9%</div>
+            <div class="stat-desc">Always available</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="py-20 bg-gradient-to-br from-primary/10 to-secondary/10">
+      <div class="container mx-auto px-4 text-center max-w-4xl">
+        <h2 class="text-3xl md:text-4xl font-bold mb-6"
+          >Ready to Join Our Community?</h2
+        >
+        <p class="text-xl text-base-content/80 mb-8 max-w-2xl mx-auto">
+          Be part of thousands of users who trust Personal QR for their
+          networking and safety needs. Get started today, completely free.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+          <a href="/home?type=profile" class="btn btn-primary btn-lg px-8">
+            <Icon name="heroicons:user-solid" class="w-5 h-5 mr-2" />
+            Create Profile QR
+          </a>
+          <a href="/home?type=emergency" class="btn btn-error btn-lg px-8">
+            <Icon
+              name="heroicons:shield-exclamation-solid"
+              class="w-5 h-5 mr-2"
+            />
+            Create Emergency QR
+          </a>
+        </div>
+
+        <div
+          class="flex justify-center items-center gap-6 text-sm text-base-content/60"
+        >
+          <div class="flex items-center gap-2">
+            <Icon
+              name="heroicons:check-circle-solid"
+              class="w-4 h-4 text-success"
+            />
+            <span>100% Free Forever</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <Icon
+              name="heroicons:check-circle-solid"
+              class="w-4 h-4 text-success"
+            />
+            <span>No Hidden Fees</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <Icon
+              name="heroicons:check-circle-solid"
+              class="w-4 h-4 text-success"
+            />
+            <span>Privacy Protected</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>

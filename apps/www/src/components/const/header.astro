@@ -1,6 +1,6 @@
 <header class="navbar bg-base-100 shadow-lg sticky top-0 z-50">
   <div class="navbar-start">
-    <div class="flex items-center gap-2">
+    <a class="flex items-center gap-2" href="/">
       <div
         class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center"
       >
@@ -17,14 +17,10 @@
         </svg>
       </div>
       <span class="text-xl font-bold">Personal QR</span>
-    </div>
+    </a>
   </div>
   <nav class="navbar-center max-md:hidden">
     <ul class="group cursor-pointer flex items-center gap-5">
-      <li
-        class="group-hover:blur-[1px] hover:blur-none hover:underline decoration-2 underline-offset-2 decoration-accent transition-all duration-500"
-        ><a href="/home">Home</a></li
-      >
       <li
         class="group-hover:blur-[1px] hover:blur-none hover:underline decoration-2 underline-offset-2 decoration-accent transition-all duration-500"
         ><a href="/about">About</a></li
@@ -86,27 +82,6 @@
         <div class="mt-5">
           <ul>
             <li
-              ><a href="/home" class="flex items-center justify-between">
-                <span>Home</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="lucide lucide-house-icon lucide-house"
-                  ><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"
-                  ></path><path
-                    d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
-                  ></path></svg
-                >
-              </a></li
-            >
-            <li
               ><a href="/about" class="flex items-center justify-between">
                 <span>About</span>
                 <svg
@@ -147,7 +122,10 @@
             >
           </ul>
         </div>
-        <button class="btn btn-primary absolute bottom-0 w-full left-0 rounded-none">Get Started</button>
+        <button
+          class="btn btn-primary absolute bottom-0 w-full left-0 rounded-none"
+          >Get Started</button
+        >
       </div>
     </div>
   </div>
