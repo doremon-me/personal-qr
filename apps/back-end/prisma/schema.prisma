@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  firstName  String
+  lastName   String
+  wpNumber   String
+  email      String
+  password   String
+  profileIds String[] @db.ObjectId
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  //  Soft delete 
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+}
+
+model Admin {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  firstName String
+  lastName  String
+  number    String   @unique()
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ProfileType {
+  PUBLIC
+  PRIVATE
+  EMERGENCY
+}
+
+model Profile {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  type          ProfileType
+  contactPerson Json
+  details       Json
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
