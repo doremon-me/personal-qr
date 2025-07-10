@@ -8,22 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  firstName  String
-  lastName   String
-  wpNumber   String
-  email      String
-  password   String
-  profileIds String[] @db.ObjectId
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  //  Soft delete 
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
-}
-
 model Admin {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   firstName String
@@ -34,18 +18,20 @@ model Admin {
   updatedAt DateTime @updatedAt
 }
 
-enum ProfileType {
-  PUBLIC
-  PRIVATE
-  EMERGENCY
-}
+model User {
+  id               String  @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  email            String?
+  number           String?
+  password         String
+  isNumberVerified Boolean @default(false)
+  isEmailVerified  Boolean @default(false)
 
-model Profile {
-  id            String      @id @default(auto()) @map("_id") @db.ObjectId
-  name          String
-  type          ProfileType
-  contactPerson Json
-  details       Json
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  // Logs
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // soft delete
+  deletedAt DateTime?
+  isDeleted Boolean   @default(false)
 }
