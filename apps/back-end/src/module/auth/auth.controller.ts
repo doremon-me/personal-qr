@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
 import { AdminSigninDto, UserSigninDto } from './dto/signin.dto';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
@@ -65,6 +65,9 @@ export class AuthController {
     @Get("verify")
     @HttpCode(HttpStatus.OK)
     async verify(@Req() req: Request, @Res() res: Response) {
+        if (!req.userAuth && !req.adminAuth) {
+            throw new UnauthorizedException("Unauthorized access");
+        }
         if (req.userAuth) {
             const user = await this.authService.verify(req.userAuth.id, "user");
             const token = await this.tokenService.userAccess(user);
