@@ -1,10 +1,12 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AuthModule } from './module/auth/auth.module';
-import { UserModule } from './module/user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './common/prisma/prisma.module';
 import { AdminModule } from './module/admin/admin.module';
 import { JwtModule } from '@nestjs/jwt';
+import { UserModule } from './module/user/user.module';
+import { JwtMiddleware } from './middleware/jwt.middleware';
+import { TokenModule } from '@common/token/token.module';
 
 @Module({
   imports: [
@@ -14,9 +16,14 @@ import { JwtModule } from '@nestjs/jwt';
     }),
     ConfigModule.forRoot({ isGlobal: true }),
     AuthModule,
-    UserModule,
     PrismaModule,
     AdminModule,
+    UserModule,
+    TokenModule
   ],
 })
-export class AppModule { }
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(JwtMiddleware).forRoutes('*');
+  }
+}
