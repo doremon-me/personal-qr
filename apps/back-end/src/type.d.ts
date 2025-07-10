@@ -6,7 +6,8 @@ import { AuthPayload } from '@common/token/token.service';
 declare global {
     namespace Express {
         interface Request {
-            auth: AuthPayload | null
+            userAuth: AuthPayload | null;
+            adminAuth: AuthPayload | null;
         }
     }
 }

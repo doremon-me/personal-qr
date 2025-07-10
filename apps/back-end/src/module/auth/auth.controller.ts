@@ -4,6 +4,8 @@ import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
 import { TokenService } from '@common/token/token.service';
 import { UserSignupDto } from './dto/signup.dto';
+import { plainToInstance } from 'class-transformer';
+import { AuthSerializer } from './auth.serilizer';
 
 @Controller('auth')
 export class AuthController {
@@ -19,7 +21,11 @@ export class AuthController {
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
             maxAge: 24 * 60 * 60 * 1000,
-        }).send();
+        });
+
+        res.json(plainToInstance(AuthSerializer, admin, {
+            excludeExtraneousValues: true,
+        }));
     }
 
     @Post("signup")
@@ -32,7 +38,11 @@ export class AuthController {
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
             maxAge: 24 * 60 * 60 * 1000,
-        }).send();
+        });
+
+        res.json(plainToInstance(AuthSerializer, user, {
+            excludeExtraneousValues: true,
+        }));
     }
 
     @Post("signin")
@@ -45,13 +55,46 @@ export class AuthController {
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
             maxAge: 24 * 60 * 60 * 1000,
-        }).send();
+        });
+
+        res.json(plainToInstance(AuthSerializer, user, {
+            excludeExtraneousValues: true,
+        }));
     }
 
     @Get("verify")
     @HttpCode(HttpStatus.OK)
-    async verify(@Req() req: Request) {
-        return req.auth;
+    async verify(@Req() req: Request, @Res() res: Response) {
+        if (req.userAuth) {
+            const user = await this.authService.verify(req.userAuth.id, "user");
+            const token = await this.tokenService.userAccess(user);
+            res.cookie('__user_access', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 24 * 60 * 60 * 1000,
+            });
+
+            res.json(plainToInstance(AuthSerializer, user, {
+                excludeExtraneousValues: true,
+            }));
+        }
+        if (req.adminAuth) {
+            const admin = await this.authService.verify(req.adminAuth.id, "admin");
+            const token = await this.tokenService.adminAccess(admin);
+
+            res.cookie('__admin_access', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 24 * 60 * 60 * 1000,
+            });
+
+            res.json(plainToInstance(AuthSerializer, admin, {
+                excludeExtraneousValues: true,
+            }));
+        }
+
     }
 
     @Post("forgetPassword")
