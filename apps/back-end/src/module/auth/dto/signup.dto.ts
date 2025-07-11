@@ -1,20 +1,10 @@
 import { IsString, IsNotEmpty, MinLength, Matches, ValidateIf } from 'class-validator';
 
-export class AdminSigninDto {
+export class UserSignupDto {
     @IsString()
-    @IsNotEmpty({ message: 'Phone number is required' })
-    @Matches(/^[6-9]\d{9}$/, {
-        message: 'Please enter a valid 10-digit Indian phone number starting with 6, 7, 8, or 9',
-    })
-    number: string;
+    @IsNotEmpty({ message: 'Name is required' })
+    name: string;
 
-    @IsString()
-    @IsNotEmpty({ message: 'Password is required' })
-    @MinLength(6, { message: 'Password must be at least 6 characters long' })
-    password: string;
-}
-
-export class UserSigninDto {
     @IsString()
     @IsNotEmpty({ message: 'Email is required' })
     @ValidateIf((o) => !o.number)
