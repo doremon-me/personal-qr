@@ -7,7 +7,6 @@ export class AdminService {
     constructor(private readonly prismaService: PrismaService) { }
     async findOne(findOneDto: FindOneDto) {
         try {
-            console.log('Finding admin with criteria:', findOneDto);
             return await this.prismaService.admin.findFirst({
                 where: {
                     OR: [

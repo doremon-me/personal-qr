@@ -81,6 +81,7 @@ export class AuthController {
             res.json(plainToInstance(AuthSerializer, user, {
                 excludeExtraneousValues: true,
             }));
+            return;
         }
         if (req.adminAuth) {
             const admin = await this.authService.verify(req.adminAuth.id, "admin");
@@ -96,6 +97,7 @@ export class AuthController {
             res.json(plainToInstance(AuthSerializer, admin, {
                 excludeExtraneousValues: true,
             }));
+            return;
         }
 
     }
