@@ -14,8 +14,9 @@ export class UserService {
                     AND: [
                         {
                             OR: [
-                                { number: findOneDto.number },
-                                { email: findOneDto.email }
+                                { number: findOneDto.number || undefined },
+                                { email: findOneDto.email || undefined },
+                                { id: findOneDto.id || undefined }
                             ]
                         },
                         { isDeleted: false }

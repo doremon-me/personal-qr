@@ -9,19 +9,27 @@ export class JwtMiddleware implements NestMiddleware {
 
         const authHeader = req.headers.authorization;
         const userCookieToken = req.cookies?.__user_access;
-        const userHeaderToken = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
+        const userHeaderToken = authHeader && authHeader.startsWith('Authorization_User ') ? authHeader.split(' ')[1] : null;
         const userToken: string = userCookieToken || userHeaderToken;
 
         const adminCookieToken = req.cookies?.__admin_access;
-        const adminHeaderToken = authHeader && authHeader.startsWith('Access ') ? authHeader.split(' ')[1] : null;
+        const adminHeaderToken = authHeader && authHeader.startsWith('Authorization_Admin ') ? authHeader.split(' ')[1] : null;
         const adminToken: string = adminCookieToken || adminHeaderToken;
 
-        if (userToken || adminToken) {
+        if (userToken) {
             try {
-                const decoded = userToken ? await this.tokenService.userAccess(userToken) : await this.tokenService.adminAccess(adminToken);
-                req.auth = decoded;
+                const decoded = await this.tokenService.userAccess(userToken);
+                req.userAuth = decoded;
             } catch (error) {
-                req.auth = null;
+                req.userAuth = null;
+            }
+        }
+        if (adminToken) {
+            try {
+                const decoded = await this.tokenService.adminAccess(adminToken);
+                req.adminAuth = decoded;
+            } catch (error) {
+                req.adminAuth = null;
             }
         }
 
