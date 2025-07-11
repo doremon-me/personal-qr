@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { userSignIn } from "./api/authApi";
 
 interface SigninFormData {
-  mobile: string;
+  email: string;
   password: string;
-  rememberMe: boolean;
 }
 
 const Signin = () => {
@@ -19,23 +19,22 @@ const Signin = () => {
   } = useForm<SigninFormData>({
     mode: "onChange",
     defaultValues: {
-      mobile: "",
+      email: "",
       password: "",
-      rememberMe: false,
     },
   });
 
   const onSubmit = async (data: SigninFormData) => {
     setIsLoading(true);
 
-    // Add your signin logic here
-    console.log("Signin attempt:", data);
-
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      await userSignIn(data);
+      window.location.href = "/home/qr";
+    } catch (error) {
+      console.log("Error during sign in:", error);
+    } finally {
       setIsLoading(false);
-      window.location.assign("/home/qr");
-    }, 2000);
+    }
   };
 
   return (
@@ -125,29 +124,25 @@ const Signin = () => {
               </h2>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                {/* Mobile Number Field */}
+                {/* Email Field */}
                 <div className="form-control">
                   <label className="label">
                     <span className="label-text font-medium">
-                      Mobile Number
+                      Email Address
                     </span>
                   </label>
                   <div className="relative">
                     <input
-                      type="tel"
-                      placeholder="Enter your mobile number"
+                      type="email"
+                      placeholder="Enter your email address"
                       className={`input input-bordered w-full pl-12 focus:input-primary ${
-                        errors.mobile ? "input-error" : ""
+                        errors.email ? "input-error" : ""
                       }`}
-                      {...register("mobile", {
-                        required: "Mobile number is required",
+                      {...register("email", {
+                        required: "Email is required",
                         pattern: {
-                          value: /^[+]?[(]?\d{10,15}$/,
-                          message: "Please enter a valid mobile number",
-                        },
-                        minLength: {
-                          value: 10,
-                          message: "Mobile number must be at least 10 digits",
+                          value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                          message: "Please enter a valid email address",
                         },
                       })}
                     />
@@ -161,14 +156,14 @@ const Signin = () => {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                        d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                       />
                     </svg>
                   </div>
-                  {errors.mobile && (
+                  {errors.email && (
                     <label className="label">
                       <span className="label-text-alt text-error">
-                        {errors.mobile.message}
+                        {errors.email.message}
                       </span>
                     </label>
                   )}
@@ -269,7 +264,6 @@ const Signin = () => {
                     <input
                       type="checkbox"
                       className="checkbox checkbox-primary checkbox-sm"
-                      {...register("rememberMe")}
                     />
                     <span className="label-text ml-2">Remember me</span>
                   </label>

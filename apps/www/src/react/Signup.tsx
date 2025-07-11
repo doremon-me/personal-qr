@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import OtpPopup from "./OtpPopup";
+import { userSignUp } from "./api/authApi";
 
 interface SignupFormData {
   name: string;
-  emailOrPhone: string;
+  email: string;
   password: string;
-
-  agreeToTerms: boolean;
 }
 
 const Signup = () => {
@@ -30,10 +29,8 @@ const Signup = () => {
     mode: "onChange",
     defaultValues: {
       name: "",
-      emailOrPhone: "",
+      email: "",
       password: "",
-
-      agreeToTerms: false,
     },
   });
 
@@ -61,11 +58,14 @@ const Signup = () => {
     setIsLoading(true);
     setSignupData(data);
 
-    // Simulate sending OTP
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await userSignUp(data);
       setShowOtpModal(true);
-    }, 1000);
+    } catch (error) {
+      console.error("Error during signup:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Verify OTP and complete signup
@@ -90,7 +90,7 @@ const Signup = () => {
   // Resend OTP
   const handleResendOtp = () => {
     // Simulate resending OTP
-    alert(`OTP sent to ${signupData?.emailOrPhone}`);
+    alert(`OTP sent to ${signupData?.email}`);
   };
 
   // Close OTP modal
@@ -239,15 +239,15 @@ const Signup = () => {
                     <span className="label-text font-medium">
                       Email or Phone
                     </span>
-                    </label>
+                  </label>
                   <div className="relative">
                     <input
                       type="text"
                       placeholder="Enter your email or phone number"
                       className={`input input-bordered w-full pl-12 focus:input-primary ${
-                        errors.emailOrPhone ? "input-error" : ""
+                        errors.email ? "input-error" : ""
                       }`}
-                      {...register("emailOrPhone", {
+                      {...register("email", {
                         required: "Email or phone number is required",
                         validate: (value) => {
                           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -296,10 +296,10 @@ const Signup = () => {
                       )}
                     </svg>
                   </div>
-                  {errors.emailOrPhone && (
+                  {errors.email && (
                     <label className="label">
                       <span className="label-text-alt text-error">
-                        {errors.emailOrPhone.message}
+                        {errors.email.message}
                       </span>
                     </label>
                   )}
@@ -401,9 +401,6 @@ const Signup = () => {
                     <input
                       type="checkbox"
                       className="checkbox checkbox-primary checkbox-sm mt-0.5 flex-shrink-0"
-                      {...register("agreeToTerms", {
-                        required: "You must agree to the terms and conditions",
-                      })}
                     />
                     <div className="text-sm leading-relaxed text-base-content/80">
                       I agree to the{" "}
@@ -416,13 +413,6 @@ const Signup = () => {
                       </a>
                     </div>
                   </div>
-                  {errors.agreeToTerms && (
-                    <div className="mt-2">
-                      <span className="text-xs text-error">
-                        {errors.agreeToTerms.message}
-                      </span>
-                    </div>
-                  )}
                 </div>
 
                 {/* Sign Up Button */}
@@ -477,7 +467,7 @@ const Signup = () => {
         onClose={closeOtpModal}
         onVerify={handleOtpVerify}
         onResend={handleResendOtp}
-        emailOrPhone={signupData?.emailOrPhone || ""}
+        emailOrPhone={signupData?.email || ""}
         isLoading={otpLoading}
       />
     </div>
