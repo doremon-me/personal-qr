@@ -51,7 +51,6 @@ export class TokenService {
                 });
             }
         } catch (error) {
-            console.log(error);
             if (typeof userOrToken === 'string') {
                 throw new UnauthorizedException('Invalid or expired token');
             } else {
