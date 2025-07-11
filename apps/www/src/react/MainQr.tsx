@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
+import useAuth from "./hooks/useAuth";
 
 interface Contact {
   name: string;
@@ -17,6 +18,7 @@ interface QrFormData {
 }
 
 const MainQr = () => {
+  const { isLoaded, isAuthenticated, id } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
@@ -46,19 +48,36 @@ const MainQr = () => {
 
   const watchedContacts = watch("contacts");
 
-  // Add new contact field
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="loading loading-spinner loading-lg"></div>
+      </div>
+    );
+  }
+
+  
+  if (!isAuthenticated) {
+    window.location.href = "/auth/signinpage";
+    return null;
+  }
+
+  let userData = sessionStorage.getItem("userData");
+  console.log("User Data:", userData);
+  
+
   const addContact = () => {
     append({ name: "", number: "" });
   };
 
-  // Remove contact field
+  
   const removeContact = (index: number) => {
     if (fields.length > 1) {
       remove(index);
     }
   };
 
-  // Handle photo upload
+ 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
