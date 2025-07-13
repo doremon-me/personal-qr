@@ -34,4 +34,15 @@ model User {
   // soft delete
   deletedAt DateTime?
   isDeleted Boolean   @default(false)
+
+  Otp Otp[]
+}
+
+model Otp {
+  id     String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId String   @db.ObjectId
+  user   User     @relation(fields: [userId], references: [id])
+  otp    String
+  expiry DateTime
+  type   String
 }
