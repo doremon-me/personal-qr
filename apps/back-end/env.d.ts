@@ -10,6 +10,17 @@ declare global {
 
             ADMIN_JWT_SECRET: string;
             USER_JWT_SECRET: string;
+
+            BULLMQ_REDIS_HOST: string;
+            BULLMQ_REDIS_PORT: number;
+            BULLMQ_REDIS_USER: string;
+            BULLMQ_REDIS_PASS: string;
+
+            WHATSAPP_API: string;
+            WHATSAPP_API_KEY: string;
+
+            ZOHO_EMAIL: string;
+            ZOHO_PASSWORD: string;
         }
     }
 
