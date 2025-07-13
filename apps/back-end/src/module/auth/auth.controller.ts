@@ -6,6 +6,7 @@ import { TokenService } from '@common/token/token.service';
 import { UserSignupDto } from './dto/signup.dto';
 import { plainToInstance } from 'class-transformer';
 import { AuthSerializer } from './auth.serilizer';
+import { ForgetPassDto } from './dto/forgetpass.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -103,5 +104,7 @@ export class AuthController {
     }
 
     @Post("forgetPassword")
-    async forgetPassword(@Body() body: any) { }
+    async forgetPassword(@Body() body: ForgetPassDto) {
+        return await this.authService.forgetPass(body);
+    }
 }
