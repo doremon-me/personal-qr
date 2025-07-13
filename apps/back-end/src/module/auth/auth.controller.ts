@@ -2,11 +2,13 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, Unauthoriz
 import { AdminSigninDto, UserSigninDto } from './dto/signin.dto';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
-import { TokenService } from '@common/token/token.service';
+import { AuthPayload, TokenService } from '@common/token/token.service';
 import { UserSignupDto } from './dto/signup.dto';
 import { plainToInstance } from 'class-transformer';
 import { AuthSerializer } from './auth.serilizer';
 import { ForgetPassDto } from './dto/forgetpass.dto';
+import { VerifyOtpDto } from './dto/verifyOtp.dto';
+import { UserAuth } from '@common/decorators/userAuth.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -58,6 +60,27 @@ export class AuthController {
             maxAge: 24 * 60 * 60 * 1000,
         });
 
+        if (userSigninDto.email && user.isEmailVerified) {
+            const verifiedAccess = await this.tokenService.verifiedAccess(user);
+            res.cookie("__verified", verifiedAccess, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 24 * 60 * 60 * 1000,
+            });
+        }
+
+        if (userSigninDto.number && user.isNumberVerified) {
+            const verifiedAccess = await this.tokenService.verifiedAccess(user);
+            res.cookie("__verified", verifiedAccess, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 24 * 60 * 60 * 1000,
+            });
+        }
+
+
         res.json(plainToInstance(AuthSerializer, user, {
             excludeExtraneousValues: true,
         }));
@@ -106,5 +129,32 @@ export class AuthController {
     @Post("forgetPassword")
     async forgetPassword(@Body() body: ForgetPassDto) {
         return await this.authService.forgetPass(body);
+    }
+
+    @Post("verifyOtp")
+    async verifyOtp(@Body() body: VerifyOtpDto, @UserAuth() userAuth: AuthPayload, @Res() res: Response) {
+        if (!userAuth) {
+            throw new UnauthorizedException("Unauthorized access");
+        }
+        const user = await this.authService.verifyOtp(body, userAuth);
+        const token = await this.tokenService.userAccess(user);
+        res.cookie('__user_access', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 24 * 60 * 60 * 1000,
+        });
+
+        const verifiedAccess = await this.tokenService.verifiedAccess(user);
+        res.cookie("__verified", verifiedAccess, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 24 * 60 * 60 * 1000,
+        });
+
+        res.json(plainToInstance(AuthSerializer, user, {
+            excludeExtraneousValues: true,
+        }));
     }
 }

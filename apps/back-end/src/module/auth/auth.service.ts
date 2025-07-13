@@ -9,6 +9,8 @@ import { ForgetPassDto } from './dto/forgetpass.dto';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { OtpService } from '@module/otp/otp.service';
+import { VerifyOtpDto } from './dto/verifyOtp.dto';
+import { AuthPayload } from '@common/token/token.service';
 
 @Injectable()
 export class AuthService {
@@ -87,8 +89,8 @@ export class AuthService {
             throw new UnauthorizedException('Invalid password');
         }
 
-        if (!userSigninDto.email && !user.isEmailVerified) {
-            const otp = await this.otpService.generateOtp({ type: "forget-password", userId: user.id });
+        if (userSigninDto.email && !user.isEmailVerified) {
+            const otp = await this.otpService.generateOtp({ type: "verification", userId: user.id });
             if (userSigninDto.email) {
                 await this.emailQueue.add('send-verification-otp', {
                     type: otp.type,
@@ -99,14 +101,14 @@ export class AuthService {
             }
         }
 
-        if (!userSigninDto.number && !user.isNumberVerified) {
-            const otp = await this.otpService.generateOtp({ type: "forget-password", userId: user.id });
+        if (userSigninDto.number && !user.isNumberVerified) {
+            const otp = await this.otpService.generateOtp({ type: "verification", userId: user.id });
             if (userSigninDto.number) {
                 await this.whatsappQueue.add('send-verification-otp', {
                     type: otp.type,
                     userId: user.id,
                     otp: otp.otp,
-                    email: user.email
+                    number: user.number
                 });
             }
         }
@@ -165,5 +167,13 @@ export class AuthService {
             });
             return `Successfully send OTP to ${forgetPassDto.email}`;
         }
+    }
+
+    async verifyOtp(verifyOtpDto: VerifyOtpDto, userAuth: AuthPayload) {
+        const verification = await this.otpService.verifyOtp(verifyOtpDto.otp, userAuth.id, verifyOtpDto.type);
+        if (!verification) {
+            throw new UnauthorizedException('Invalid or expired OTP');
+        }
+        return await this.userService.updateUser(userAuth.id, verifyOtpDto.email ? { isEmailVerified: true } : { isNumberVerified: true });
     }
 }

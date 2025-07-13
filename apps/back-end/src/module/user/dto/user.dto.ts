@@ -25,6 +25,14 @@ export class UserDto {
     @MinLength(6, { message: 'Password must be at least 6 characters long' })
     password: string;
 
+    @IsBoolean()
+    @IsOptional()
+    isEmailVerified?: boolean = false;
+
+    @IsBoolean()
+    @IsOptional()
+    isNumberVerified?: boolean = false;
+
     @IsString()
     @IsISO8601({ strict: true }, { message: 'CreatedAt must be a valid ISO 8601 date string' })
     createdAt: string;

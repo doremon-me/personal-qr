@@ -3,6 +3,7 @@ import { FindOneDto } from './dto/findOne.dto';
 import { PrismaService } from '@common/prisma/prisma.service';
 import { CreateUserDto } from './dto/create.dto';
 import { hashPassword } from '@common/utils/hash.util';
+import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class UserService {
@@ -40,6 +41,21 @@ export class UserService {
             });
         } catch (error) {
             throw new InternalServerErrorException('Error creating user');
+        }
+    }
+
+    async updateUser(id: string, updateData: Partial<UserDto>) {
+        try {
+            return await this.prismaService.user.update({
+                where: { id },
+                data: {
+                    ...updateData,
+                    ...(updateData.password && { password: await hashPassword(updateData.password) }),
+                    updatedAt: new Date()
+                }
+            });
+        } catch (error) {
+            throw new InternalServerErrorException('Error updating user');
         }
     }
 }

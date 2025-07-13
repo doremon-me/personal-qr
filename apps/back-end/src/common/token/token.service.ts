@@ -6,6 +6,12 @@ export type AuthPayload = {
     id: string;
 }
 
+export type VerifiedPayload = {
+    id: string;
+    isEmailVerified?: boolean;
+    isNumberVerified?: boolean;
+}
+
 @Injectable()
 export class TokenService {
     constructor(private readonly jwtService: JwtService) { }
@@ -55,6 +61,33 @@ export class TokenService {
                 throw new UnauthorizedException('Invalid or expired token');
             } else {
                 throw new InternalServerErrorException('Failed to generate user token');
+            }
+        }
+    }
+
+    async verifiedAccess(token: string): Promise<VerifiedPayload>;
+    async verifiedAccess(user: User): Promise<string>;
+    async verifiedAccess(userOrToken: User | string): Promise<string | VerifiedPayload> {
+        try {
+            if (typeof userOrToken === "string") {
+                return await this.jwtService.verifyAsync(userOrToken, {
+                    secret: process.env.VERIFIED_JWT_SECRET
+                }) as VerifiedPayload;
+            } else {
+                const payload: VerifiedPayload = {
+                    id: userOrToken.id,
+                    isEmailVerified: userOrToken.isEmailVerified,
+                    isNumberVerified: userOrToken.isNumberVerified
+                };
+                return await this.jwtService.signAsync(payload, {
+                    secret: process.env.VERIFIED_JWT_SECRET
+                });
+            }
+        } catch (error) {
+            if (typeof userOrToken === 'string') {
+                throw new UnauthorizedException('Invalid or expired token');
+            } else {
+                throw new InternalServerErrorException('Failed to generate verified token');
             }
         }
     }
