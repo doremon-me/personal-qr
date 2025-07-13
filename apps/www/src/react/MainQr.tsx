@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import useAuth from "./hooks/useAuth";
+import * as QRCode from "qrcode";
 
 interface Contact {
   name: string;
@@ -21,6 +22,7 @@ const MainQr = () => {
   const { isLoaded, isAuthenticated, id } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [qrCodeImage, setQrCodeImage] = useState<string | null>(null);
 
   const {
     register,
@@ -56,7 +58,6 @@ const MainQr = () => {
     );
   }
 
-  
   if (!isAuthenticated) {
     window.location.href = "/auth/signinpage";
     return null;
@@ -64,20 +65,17 @@ const MainQr = () => {
 
   let userData = sessionStorage.getItem("userData");
   console.log("User Data:", userData);
-  
 
   const addContact = () => {
     append({ name: "", number: "" });
   };
 
-  
   const removeContact = (index: number) => {
     if (fields.length > 1) {
       remove(index);
     }
   };
 
- 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -86,6 +84,42 @@ const MainQr = () => {
         setPhotoPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  // Generate QR Code from form data
+  const generateQRCode = async (formData: QrFormData) => {
+    try {
+      // Create QR data object
+      const qrData = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        motherName: formData.motherName,
+        fatherName: formData.fatherName,
+        contacts: formData.contacts.filter(
+          (contact) =>
+            contact.name.trim() !== "" || contact.number.trim() !== ""
+        ),
+      };
+
+      // Convert to JSON string
+      const qrString = JSON.stringify(qrData);
+
+      // Generate QR code
+      const qrCodeDataURL = await QRCode.toDataURL(qrString, {
+        width: 300,
+        margin: 2,
+        color: {
+          dark: "#000000",
+          light: "#FFFFFF",
+        },
+      });
+
+      setQrCodeImage(qrCodeDataURL);
+    } catch (error) {
+      console.error("Error generating QR code:", error);
+      alert("Failed to generate QR code. Please try again.");
     }
   };
 
@@ -105,11 +139,15 @@ const MainQr = () => {
 
     console.log("QR Form Data:", formData);
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      // Generate QR Code
+      await generateQRCode(formData);
+
       setIsLoading(false);
-      alert("QR Code data saved successfully!");
-    }, 2000);
+    } catch (error) {
+      setIsLoading(false);
+      alert("Failed to generate QR code. Please try again.");
+    }
   };
 
   return (
@@ -655,6 +693,57 @@ const MainQr = () => {
                   )}
                 </button>
               </div>
+
+              {/* QR Code Display */}
+              {qrCodeImage && (
+                <div className="mt-8 p-6 bg-base-200/50 rounded-lg border border-base-300">
+                  <div className="text-center">
+                    <h3 className="text-lg font-semibold mb-4 text-primary">
+                      Your Personal QR Code
+                    </h3>
+                    <div className="flex justify-center mb-4">
+                      <img
+                        src={qrCodeImage}
+                        alt="Generated QR Code"
+                        className="border border-base-300 rounded-lg shadow-lg"
+                      />
+                    </div>
+                    <p className="text-sm text-base-content/70 mb-4">
+                      This QR code contains all your personal information and
+                      emergency contacts.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                      <a
+                        href={qrCodeImage}
+                        download="my-qr-code.png"
+                        className="btn btn-outline btn-primary btn-sm"
+                      >
+                        <svg
+                          className="w-4 h-4 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                          />
+                        </svg>
+                        Download QR Code
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => setQrCodeImage(null)}
+                        className="btn btn-ghost btn-sm"
+                      >
+                        Generate New QR
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </form>
           </div>
         </div>
