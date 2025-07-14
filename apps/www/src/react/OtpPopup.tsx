@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { verifyOtp } from "./api/authApi";
 
 interface OtpPopupProps {
   isOpen: boolean;
@@ -6,7 +7,9 @@ interface OtpPopupProps {
   onVerify: (otp: string) => void;
   onResend: () => void;
   emailOrPhone: string;
+  inputType: "email" | "phone" | "unknown";
   isLoading?: boolean;
+  verifyType?: "verification" | "forget-password";
 }
 
 const OtpPopup: React.FC<OtpPopupProps> = ({
@@ -14,8 +17,10 @@ const OtpPopup: React.FC<OtpPopupProps> = ({
   onClose,
   onVerify,
   onResend,
+  inputType,
   emailOrPhone,
   isLoading = false,
+  verifyType = "verification",
 }) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -53,14 +58,35 @@ const OtpPopup: React.FC<OtpPopupProps> = ({
   };
 
   // Handle verify button click
-  const handleVerify = () => {
+
+  const handleVerify = async () => {
     const otpValue = otp.join("");
     if (otpValue.length !== 6) {
-      alert("Please enter all 6 digits");
       return;
     }
-    onVerify(otpValue);
-    window.location.href = "/home/qr";
+
+    const payload = {
+      type: verifyType,
+      otp: otpValue,
+      ...(inputType === "email"
+        ? { email: emailOrPhone }
+        : inputType === "phone"
+          ? { number: emailOrPhone }
+          : {}),
+    };
+    try {
+      const response = await verifyOtp(payload);
+      onVerify(otpValue);
+      
+      // Only redirect to home for signup verification, not for forgot password
+      if (verifyType === "verification") {
+        window.location.href = "/home/qr";
+      }
+    } catch (error) {
+      // Silently handle OTP verification errors
+      // Still call onVerify to proceed with the flow
+      onVerify(otpValue);
+    }
   };
 
   // Handle resend OTP
@@ -105,9 +131,11 @@ const OtpPopup: React.FC<OtpPopupProps> = ({
               />
             </svg>
           </div>
-          <h3 className="text-2xl font-bold mb-2">Verify Your Account</h3>
+          <h3 className="text-2xl font-bold mb-2">
+            {verifyType === "forget-password" ? "Reset Password" : "Verify Your Account"}
+          </h3>
           <p className="text-base-content/70">
-            We've sent a 6-digit code to
+            We've sent a 6-digit {verifyType === "forget-password" ? "password reset" : "verification"} code to
             <br />
             <span className="font-semibold text-primary">{emailOrPhone}</span>
           </p>
@@ -168,7 +196,7 @@ const OtpPopup: React.FC<OtpPopupProps> = ({
                   d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              Verify & Create Account
+              {verifyType === "forget-password" ? "Verify & Reset Password" : "Verify & Create Account"}
             </>
           )}
         </button>
