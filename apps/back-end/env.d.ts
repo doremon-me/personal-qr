@@ -10,6 +10,8 @@ declare global {
 
             ADMIN_JWT_SECRET: string;
             USER_JWT_SECRET: string;
+            VERIFIED_JWT_SECRET: string;
+            PASSWORD_RESET_JWT_SECRET: string;
 
             BULLMQ_REDIS_HOST: string;
             BULLMQ_REDIS_PORT: number;

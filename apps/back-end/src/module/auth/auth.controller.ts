@@ -1,14 +1,16 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, InternalServerErrorException, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
 import { AdminSigninDto, UserSigninDto } from './dto/signin.dto';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
-import { AuthPayload, TokenService } from '@common/token/token.service';
+import { AuthPayload, TokenService, PasswordResetPayload } from '@common/token/token.service';
 import { UserSignupDto } from './dto/signup.dto';
 import { plainToInstance } from 'class-transformer';
 import { AuthSerializer } from './auth.serilizer';
 import { ForgetPassDto } from './dto/forgetpass.dto';
 import { VerifyOtpDto } from './dto/verifyOtp.dto';
 import { UserAuth } from '@common/decorators/userAuth.decorator';
+import { ResetPassDto } from './dto/resetpass.dto';
+import { PasswordReset } from '@common/decorators/resetPass.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -80,7 +82,6 @@ export class AuthController {
             });
         }
 
-
         res.json(plainToInstance(AuthSerializer, user, {
             excludeExtraneousValues: true,
         }));
@@ -127,8 +128,18 @@ export class AuthController {
     }
 
     @Post("forgetPassword")
-    async forgetPassword(@Body() body: ForgetPassDto) {
-        return await this.authService.forgetPass(body);
+    async forgetPassword(@Body() body: ForgetPassDto, @Res() res: Response) {
+        const user = await this.authService.forgetPass(body);
+        const token = await this.tokenService.userAccess(user);
+        res.cookie('__user_access', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 24 * 60 * 60 * 1000,
+        });
+        res.json(plainToInstance(AuthSerializer, user, {
+            excludeExtraneousValues: true,
+        }));
     }
 
     @Post("verifyOtp")
@@ -153,6 +164,39 @@ export class AuthController {
             maxAge: 24 * 60 * 60 * 1000,
         });
 
+        if (body.type === "forget-password") {
+            const token = await this.tokenService.passwordResetAccess(user);
+            res.cookie('__password_reset', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 10 * 60 * 1000,
+            });
+        }
+
+        res.json(plainToInstance(AuthSerializer, user, {
+            excludeExtraneousValues: true,
+        }));
+    }
+
+    @Post("resetPassword")
+    @HttpCode(HttpStatus.OK)
+    async resetPassword(@Res() res: Response, @Body() resetPassDto: ResetPassDto, @PasswordReset() passwordReset: PasswordResetPayload) {
+        if (!passwordReset) {
+            throw new UnauthorizedException("Unauthorized access");
+        }
+        const user = await this.authService.resetPassword(resetPassDto, passwordReset);
+        if (!user) {
+            throw new InternalServerErrorException("Failed to reset password");
+        }
+        const token = await this.tokenService.userAccess(user);
+        res.cookie('__user_access', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 24 * 60 * 60 * 1000,
+        });
+        res.clearCookie("__password_reset");
         res.json(plainToInstance(AuthSerializer, user, {
             excludeExtraneousValues: true,
         }));

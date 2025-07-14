@@ -12,12 +12,19 @@ export type VerifiedPayload = {
     isNumberVerified?: boolean;
 }
 
+export type PasswordResetPayload = {
+    id: string;
+    email: string | null;
+    number: string | null;
+    isEmailVerified?: boolean;
+    isNumberVerified?: boolean;
+}
+
 @Injectable()
 export class TokenService {
     constructor(private readonly jwtService: JwtService) { }
     adminAccess(admin: Admin): Promise<string>;
     adminAccess(token: string): Promise<AuthPayload>;
-
     async adminAccess(adminOrToken: Admin | string): Promise<string | AuthPayload> {
         try {
             if (typeof adminOrToken === "string") {
@@ -42,7 +49,6 @@ export class TokenService {
 
     userAccess(user: User): Promise<string>;
     userAccess(token: string): Promise<AuthPayload>;
-
     async userAccess(userOrToken: User | string): Promise<string | AuthPayload> {
         try {
             if (typeof userOrToken === "string") {
@@ -88,6 +94,35 @@ export class TokenService {
                 throw new UnauthorizedException('Invalid or expired token');
             } else {
                 throw new InternalServerErrorException('Failed to generate verified token');
+            }
+        }
+    }
+
+    async passwordResetAccess(user: User): Promise<string>;
+    async passwordResetAccess(token: string): Promise<PasswordResetPayload>;
+    async passwordResetAccess(userOrToken: User | string): Promise<string | PasswordResetPayload> {
+        try{
+            if (typeof userOrToken === "string") {
+                return await this.jwtService.verifyAsync(userOrToken, {
+                    secret: process.env.PASSWORD_RESET_JWT_SECRET
+                }) as PasswordResetPayload;
+            } else {
+                const payload: PasswordResetPayload = {
+                    id: userOrToken.id,
+                    email: userOrToken.email,
+                    number: userOrToken.number,
+                    isEmailVerified: userOrToken.isEmailVerified,
+                    isNumberVerified: userOrToken.isNumberVerified
+                };
+                return await this.jwtService.signAsync(payload, {
+                    secret: process.env.PASSWORD_RESET_JWT_SECRET
+                });
+            }
+        }catch (error) {
+            if (typeof userOrToken === 'string') {
+                throw new UnauthorizedException('Invalid or expired token');
+            } else {
+                throw new InternalServerErrorException('Failed to generate password reset token');
             }
         }
     }

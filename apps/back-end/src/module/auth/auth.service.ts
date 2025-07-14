@@ -10,7 +10,8 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { OtpService } from '@module/otp/otp.service';
 import { VerifyOtpDto } from './dto/verifyOtp.dto';
-import { AuthPayload } from '@common/token/token.service';
+import { AuthPayload, PasswordResetPayload } from '@common/token/token.service';
+import { ResetPassDto } from './dto/resetpass.dto';
 
 @Injectable()
 export class AuthService {
@@ -156,7 +157,6 @@ export class AuthService {
                 otp: otp.otp,
                 number: user.number
             });
-            return `Successfully send OTP to ${forgetPassDto.number}`;
         }
         if (forgetPassDto.email) {
             await this.emailQueue.add('send-forget-password-otp', {
@@ -165,8 +165,8 @@ export class AuthService {
                 otp: otp.otp,
                 email: user.email
             });
-            return `Successfully send OTP to ${forgetPassDto.email}`;
         }
+        return user;
     }
 
     async verifyOtp(verifyOtpDto: VerifyOtpDto, userAuth: AuthPayload) {
@@ -175,5 +175,11 @@ export class AuthService {
             throw new UnauthorizedException('Invalid or expired OTP');
         }
         return await this.userService.updateUser(userAuth.id, verifyOtpDto.email ? { isEmailVerified: true } : { isNumberVerified: true });
+    }
+
+    async resetPassword(resetPassDto: ResetPassDto, resetPassword: PasswordResetPayload) {
+        return await this.userService.updateUser(resetPassword.id, {
+            password: resetPassDto.password,
+        });
     }
 }
