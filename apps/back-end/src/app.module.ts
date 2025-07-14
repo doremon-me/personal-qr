@@ -9,6 +9,7 @@ import { JwtMiddleware } from './middleware/jwt.middleware';
 import { TokenModule } from '@common/token/token.module';
 import { BullModule } from '@nestjs/bullmq';
 import { OtpModule } from './module/otp/otp.module';
+import { ResetPassMiddleware } from './middleware/resetpass.middleware';
 
 @Module({
   imports: [
@@ -34,5 +35,6 @@ import { OtpModule } from './module/otp/otp.module';
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(JwtMiddleware).forRoutes('*');
+    consumer.apply(ResetPassMiddleware).forRoutes('auth/resetPassword');
   }
 }
