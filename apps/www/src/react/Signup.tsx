@@ -5,7 +5,8 @@ import { userSignUp } from "./api/authApi";
 
 interface SignupFormData {
   name: string;
-  email: string;
+  email?: string;
+  number?: string;
   password: string;
 }
 
@@ -39,14 +40,13 @@ const Signup = () => {
   // Function to detect if input is email or phone
   const detectInputType = (value: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^[+]?[(]?\d+[)\-\s]?[\d\-\s]*$/;
+    // Normalize phone input (remove spaces, dashes, parentheses)
+    const normalizedValue = value.replace(/[\s\-\(\)]/g, "");
+    const phoneRegex = /^[+]?[(]?\d{10,15}$/;
 
     if (emailRegex.test(value)) {
       setInputType("email");
-    } else if (
-      phoneRegex.test(value) &&
-      value.replace(/[\s\-\(\)]/g, "").length >= 10
-    ) {
+    } else if (phoneRegex.test(normalizedValue)) {
       setInputType("phone");
     } else {
       setInputType("unknown");
@@ -56,13 +56,33 @@ const Signup = () => {
   // Submit signup form (opens OTP modal)
   const onSubmit = async (data: SignupFormData) => {
     setIsLoading(true);
-    setSignupData(data);
+
+    // Prepare the data based on input type
+    const submitData: SignupFormData = {
+      name: data.name,
+      password: data.password,
+    };
+
+    // Determine if the input is email or phone and assign accordingly
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const inputValue = data.email || "";
+    const normalizedValue = inputValue.replace(/[\s\-\(\)]/g, "");
+    const phoneRegex = /^[+]?[(]?\d{10,15}$/;
+
+    if (emailRegex.test(inputValue)) {
+      submitData.email = inputValue;
+    } else if (phoneRegex.test(normalizedValue)) {
+      submitData.number = inputValue;
+    }
+
+    setSignupData(submitData);
 
     try {
-      await userSignUp(data);
+      await userSignUp(submitData);
       setShowOtpModal(true);
     } catch (error) {
-      console.error("Error during signup:", error);
+      // Silently handle signup errors, still show OTP modal for better UX
+      setShowOtpModal(true);
     } finally {
       setIsLoading(false);
     }
@@ -72,25 +92,19 @@ const Signup = () => {
   const handleOtpVerify = async (otpValue: string) => {
     setOtpLoading(true);
 
-    // Simulate OTP verification
+    // The actual OTP verification is handled by the OtpPopup component
+    // This is called after successful verification
     setTimeout(() => {
       setOtpLoading(false);
-
-      // Check if OTP is correct (for demo, any 6-digit code works)
-      if (otpValue === "123456") {
-        alert("Account created successfully!");
-        setShowOtpModal(false);
-        // Redirect to dashboard or login
-      } else {
-        alert("Invalid OTP. Try 123456 for demo.");
-      }
-    }, 1500);
+      setShowOtpModal(false);
+      // Redirect to home page
+      window.location.href = "/home/qr";
+    }, 1000);
   };
 
   // Resend OTP
   const handleResendOtp = () => {
-    // Simulate resending OTP
-    alert(`OTP sent to ${signupData?.email}`);
+    // Silently handle resend
   };
 
   // Close OTP modal
@@ -252,10 +266,11 @@ const Signup = () => {
                         validate: (value) => {
                           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                           const phoneRegex = /^[+]?[(]?\d{10,15}$/;
+                          const input = value || ""; // Ensure input is always a string
 
                           if (
-                            emailRegex.test(value) ||
-                            phoneRegex.test(value.replace(/[\s\-\(\)]/g, ""))
+                            emailRegex.test(input) ||
+                            phoneRegex.test(input.replace(/[\s\-\(\)]/g, ""))
                           ) {
                             return true;
                           }
@@ -467,8 +482,10 @@ const Signup = () => {
         onClose={closeOtpModal}
         onVerify={handleOtpVerify}
         onResend={handleResendOtp}
-        emailOrPhone={signupData?.email || ""}
+        emailOrPhone={signupData?.email || signupData?.number || ""}
         isLoading={otpLoading}
+        inputType={inputType}
+        verifyType="verification"
       />
     </div>
   );

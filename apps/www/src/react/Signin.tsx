@@ -1,15 +1,30 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { userSignIn } from "./api/authApi";
+import { userSignIn, forgotPassword } from "./api/authApi";
+import type { SignInFormData } from "./api/authApi";
+import OtpPopup from "./OtpPopup";
+import ResetPassword from "./ResetPassword";
 
 interface SigninFormData {
   email: string;
   password: string;
 }
 
+interface ForgotPasswordData {
+  email?: string;
+  number?: string;
+}
+
 const Signin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [inputType, setInputType] = useState<"email" | "phone" | "unknown">(
+    "unknown"
+  );
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [forgotPasswordData, setForgotPasswordData] = useState<ForgotPasswordData | null>(null);
 
   const {
     register,
@@ -24,14 +39,118 @@ const Signin = () => {
     },
   });
 
+  const password = watch("password");
+  const emailField = watch("email");
+
+  // Function to detect if input is email or phone
+  const detectInputType = (value: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Normalize phone input (remove spaces, dashes, parentheses)
+    const normalizedValue = value.replace(/[\s\-\(\)]/g, "");
+    const phoneRegex = /^[+]?[(]?\d{10,15}$/;
+
+    if (emailRegex.test(value)) {
+      setInputType("email");
+    } else if (phoneRegex.test(normalizedValue)) {
+      setInputType("phone");
+    } else {
+      setInputType("unknown");
+    }
+  };
+
+  // Handle forgot password
+  const handleForgotPassword = async () => {
+    if (!emailField || emailField.trim() === "") {
+      return;
+    }
+
+    setIsLoading(true);
+
+    // Prepare the data based on input type
+    const submitData: ForgotPasswordData = {};
+
+    // Determine if the input is email or phone and assign accordingly
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const inputValue = emailField || "";
+    const normalizedValue = inputValue.replace(/[\s\-\(\)]/g, "");
+    const phoneRegex = /^[+]?[(]?\d{10,15}$/;
+
+    if (emailRegex.test(inputValue)) {
+      submitData.email = inputValue;
+    } else if (phoneRegex.test(normalizedValue)) {
+      submitData.number = inputValue;
+    } else {
+      setIsLoading(false);
+      return;
+    }
+
+    setForgotPasswordData(submitData);
+
+    try {
+      await forgotPassword(submitData);
+      setShowOtpModal(true);
+    } catch (error) {
+      // Silently handle error, still show OTP modal for better UX
+      setShowOtpModal(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Verify OTP for forgot password
+  const handleOtpVerify = async (otpValue: string) => {
+    setOtpLoading(true);
+
+    try {
+      // The OTP verification is handled by the OtpPopup component
+      // This function is called after successful verification
+      setOtpLoading(false);
+      setShowOtpModal(false);
+      setShowResetModal(true);
+    } catch (error) {
+      setOtpLoading(false);
+    }
+  };
+
+  // Resend OTP for forgot password
+  const handleResendOtp = () => {
+    // Silently handle resend
+  };
+
+  // Close OTP modal
+  const closeOtpModal = () => {
+    setShowOtpModal(false);
+  };
+
+  // Handle successful password reset
+  const handleResetSuccess = () => {
+    setShowResetModal(false);
+    // Redirect to signin page
+    window.location.href = "/auth/signinpage";
+  };
+
   const onSubmit = async (data: SigninFormData) => {
     setIsLoading(true);
 
     try {
-      await userSignIn(data);
+      const apiData: SignInFormData = { password: data.password };
+      
+      // Determine if the input is email or phone and assign accordingly
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const inputValue = data.email || "";
+      const normalizedValue = inputValue.replace(/[\s\-\(\)]/g, "");
+      const phoneRegex = /^[+]?[(]?\d{10,15}$/;
+
+      if (emailRegex.test(inputValue)) {
+        apiData.email = inputValue;
+      } else if (phoneRegex.test(normalizedValue)) {
+        apiData.number = inputValue;
+      }
+
+      await userSignIn(apiData);
       window.location.href = "/home/qr";
     } catch (error) {
-      console.log("Error during sign in:", error);
+      // Silently handle signin errors
     } finally {
       setIsLoading(false);
     }
@@ -124,25 +243,37 @@ const Signin = () => {
               </h2>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                {/* Email Field */}
+                {/* Email or Phone Field */}
                 <div className="form-control">
                   <label className="label">
                     <span className="label-text font-medium">
-                      Email Address
+                      Email or Phone
                     </span>
                   </label>
                   <div className="relative">
                     <input
-                      type="email"
-                      placeholder="Enter your email address"
+                      type="text"
+                      placeholder="Enter your email or phone number"
                       className={`input input-bordered w-full pl-12 focus:input-primary ${
                         errors.email ? "input-error" : ""
                       }`}
                       {...register("email", {
-                        required: "Email is required",
-                        pattern: {
-                          value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                          message: "Please enter a valid email address",
+                        required: "Email or phone number is required",
+                        validate: (value) => {
+                          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                          const phoneRegex = /^[+]?[(]?\d{10,15}$/;
+                          const input = value || "";
+
+                          if (
+                            emailRegex.test(input) ||
+                            phoneRegex.test(input.replace(/[\s\-\(\)]/g, ""))
+                          ) {
+                            return true;
+                          }
+                          return "Please enter a valid email address or phone number";
+                        },
+                        onChange: (e) => {
+                          detectInputType(e.target.value);
                         },
                       })}
                     />
@@ -152,12 +283,28 @@ const Signin = () => {
                       stroke="currentColor"
                       viewBox="0 0 24 24"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                      />
+                      {inputType === "email" ? (
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                        />
+                      ) : inputType === "phone" ? (
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                        />
+                      ) : (
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
+                        />
+                      )}
                     </svg>
                   </div>
                   {errors.email && (
@@ -267,9 +414,14 @@ const Signin = () => {
                     />
                     <span className="label-text ml-2">Remember me</span>
                   </label>
-                  <a href="#" className="link link-primary text-sm">
+                  <button
+                    type="button"
+                    onClick={handleForgotPassword}
+                    className="link link-primary text-sm"
+                    disabled={isLoading}
+                  >
                     Forgot password?
-                  </a>
+                  </button>
                 </div>
 
                 {/* Sign In Button */}
@@ -331,6 +483,27 @@ const Signin = () => {
           </div>
         </div>
       </div>
+
+      {/* OTP Popup for Forgot Password */}
+      <OtpPopup
+        isOpen={showOtpModal}
+        onClose={closeOtpModal}
+        onVerify={handleOtpVerify}
+        onResend={handleResendOtp}
+        emailOrPhone={
+          forgotPasswordData?.email || forgotPasswordData?.number || ""
+        }
+        isLoading={otpLoading}
+        inputType={inputType}
+        verifyType="forget-password"
+      />
+
+      {/* Reset Password Modal */}
+      <ResetPassword
+        isOpen={showResetModal}
+        onClose={() => setShowResetModal(false)}
+        onResetSuccess={handleResetSuccess}
+      />
     </div>
   );
 };
