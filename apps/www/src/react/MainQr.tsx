@@ -21,8 +21,11 @@ interface QrFormData {
 
 interface ProfileData {
   id: string;
+  name: string;
+  email: string;
+  number: string | null;
   userId: string;
-  type: string;
+  type?: string;
   motherName: string;
   fatherName: string;
   createdAt: string;
@@ -51,6 +54,9 @@ const MainQr = () => {
   } = useForm<QrFormData>({
     mode: "onChange",
     defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
       motherName: "",
       fatherName: "",
       contacts: [{ contactPersonName: "", contactPersonNumber: "" }],
@@ -65,14 +71,22 @@ const MainQr = () => {
   const watchedContacts = watch("contacts");
   const watchedMotherName = watch("motherName");
   const watchedFatherName = watch("fatherName");
+  const watchedName = watch("name");
+  const watchedEmail = watch("email");
+  const watchedPhone = watch("phone");
 
   const hasDataChanged = useCallback(
     (formData: QrFormData) => {
       if (!existingProfile) return true;
-      if (formData.motherName !== existingProfile.motherName) return true;
 
+      // Compare personal information
+      if (formData.name !== existingProfile.name) return true;
+      if (formData.email !== existingProfile.email) return true;
+      if (formData.phone !== existingProfile.number) return true;
+      if (formData.motherName !== existingProfile.motherName) return true;
       if (formData.fatherName !== existingProfile.fatherName) return true;
 
+      // Compare contacts
       const existingContacts = existingProfile.Contacts || [];
       const newContacts = formData.contacts.filter(
         (contact) =>
@@ -103,6 +117,9 @@ const MainQr = () => {
     if (!existingProfile) return false;
 
     const currentData: QrFormData = {
+      name: watchedName || "",
+      email: watchedEmail || "",
+      phone: watchedPhone || "",
       motherName: watchedMotherName || "",
       fatherName: watchedFatherName || "",
       contacts: watchedContacts || [],
@@ -111,6 +128,9 @@ const MainQr = () => {
     return hasDataChanged(currentData);
   }, [
     existingProfile,
+    watchedName,
+    watchedEmail,
+    watchedPhone,
     watchedMotherName,
     watchedFatherName,
     watchedContacts,
@@ -132,6 +152,10 @@ const MainQr = () => {
       if (profileData) {
         setExistingProfile(profileData);
 
+        // Populate personal information fields
+        setValue("name", profileData.name || "");
+        setValue("email", profileData.email || "");
+        setValue("phone", profileData.number || "");
         setValue("motherName", profileData.motherName || "");
         setValue("fatherName", profileData.fatherName || "");
 
@@ -257,6 +281,9 @@ const MainQr = () => {
       if (existingProfile && dataChanged) {
         const updateData = {
           id: existingProfile.id,
+          name: data.name,
+          email: data.email,
+          number: data.phone,
           motherName: data.motherName,
           fatherName: data.fatherName,
           contacts: filteredContacts,
@@ -271,6 +298,9 @@ const MainQr = () => {
         );
       } else if (!existingProfile) {
         const profileData = {
+          name: data.name,
+          email: data.email,
+          number: data.phone,
           motherName: data.motherName,
           fatherName: data.fatherName,
           contacts: filteredContacts,
