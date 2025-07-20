@@ -5,7 +5,9 @@ import { AuthPayload, VerifiedPayload } from '@common/token/token.service';
 import { ProfileDto } from './dto/profile.dto';
 import { VerifiedInfo } from '@common/decorators/verified.decorator';
 import { UpdateProfileDto } from './dto/updateProfile.dto';
+import { UserSerializer } from './user.serilizer';
 import { Response } from 'express';
+import { plainToInstance } from 'class-transformer';
 
 @Controller('user')
 export class UserController {
@@ -46,7 +48,21 @@ export class UserController {
             throw new UnauthorizedException("User not authenticated");
         }
 
-        return await this.userService.fetchProfile(user);
+        const profileInfo = await this.userService.fetchProfile(user);
+        return plainToInstance(UserSerializer, {
+            id: profileInfo.user.id,
+            profileId: profileInfo.profile.id,
+            name: profileInfo.user.name,
+            email: profileInfo.user.email,
+            number: profileInfo.user.number,
+            fatherName: profileInfo.profile.fatherName,
+            motherName: profileInfo.profile.motherName,
+            Contacts: profileInfo.profile.Contacts.map(contact => ({
+                id: contact.id,
+                contactPersonName: contact.contactPersonName,
+                contactPersonNumber: contact.contactPersonNumber
+            }))
+        }, { excludeExtraneousValues: true })
     }
 
     @Delete("delete")

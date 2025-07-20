@@ -186,7 +186,10 @@ export class UserService {
             }
         });
         if (!profile) throw new NotFoundException('Profile not found');
-        return profile;
+        return {
+            user: checkUser,
+            profile,
+        }
     }
 
     async deleteUser(user: AuthPayload) {
