@@ -1,0 +1,349 @@
+---
+import Layout from "@layouts/Layout.astro";
+import MetaTags from "@seo/meta.tags.astro";
+import { Icon } from "astro-icon/components";
+---
+
+<Layout>
+  <MetaTags
+    title="About Us - Personal QR"
+    description="Learn about Personal QR, our mission to create smart QR solutions for personal profiles and emergency contacts, and meet our dedicated team."
+  />
+
+  <!-- Hero Section -->
+  <section
+    class="bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10 py-12"
+  >
+    <div class="container mx-auto px-4">
+      <div class="text-center">
+        <!-- Badge -->
+        <div class="badge badge-secondary badge-lg px-6 py-3 mb-6">
+          About Us
+        </div>
+
+        <!-- Main Headline -->
+        <h1 class="text-4xl md:text-6xl font-bold mb-6">
+          Meet the Team <span class="text-primary">Behind</span><br />
+          Personal QR
+        </h1>
+
+        <!-- Subtitle -->
+        <p class="md:text-lg text-base-content/80 max-w-3xl mx-auto">
+          We're on a mission to create simple, secure, and effective QR code
+          solutions for personal profiles and emergency situations.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Our Story Section -->
+  <section class="py-16">
+    <div class="container mx-auto px-4 max-w-6xl">
+      <div class="grid md:grid-cols-2 gap-12 items-center">
+        <!-- Image -->
+        <div class="order-2 md:order-1">
+          <div class="relative">
+            <div
+              class="absolute -inset-4 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-xl blur-xl opacity-60"
+            >
+            </div>
+            <img
+              src="https://images.unsplash.com/photo-1515187029135-18ee286d815b?q=80&w=1470&auto=format&fit=crop"
+              alt="Team collaboration"
+              class="rounded-xl shadow-xl w-full h-auto relative z-10 object-cover aspect-[4/3]"
+            />
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="order-1 md:order-2">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="h-1 w-12 bg-primary rounded-full"></div>
+            <h2 class="text-lg font-medium text-primary">Our Story</h2>
+          </div>
+
+          <h3 class="text-3xl md:text-4xl font-bold mb-6">
+            Simplifying Connections Through Technology
+          </h3>
+
+          <p class="text-base-content/80 mb-6">
+            Personal QR was founded in 2023 with a simple but powerful idea: to
+            create a seamless connection between people using QR code
+            technology. We saw the need for both professional networking tools
+            and emergency response solutions, and built a platform that serves
+            both purposes elegantly.
+          </p>
+
+          <p class="text-base-content/80 mb-6">
+            Our team combines expertise in software development, UX design, and
+            security to create an intuitive platform that prioritizes both user
+            experience and data protection.
+          </p>
+
+          <div class="stats bg-base-100 shadow">
+            <div class="stat">
+              <div class="stat-figure text-primary">
+                <Icon name="lucide:users" size={32} />
+              </div>
+              <div class="stat-title">Happy Users</div>
+              <div class="stat-value text-primary">10K+</div>
+            </div>
+
+            <div class="stat">
+              <div class="stat-figure text-secondary">
+                <Icon name="lucide:qr-code" size={32} />
+              </div>
+              <div class="stat-title">QR Codes Created</div>
+              <div class="stat-value text-secondary">25K+</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Our Values -->
+  <section class="py-16 bg-base-200/50">
+    <div class="container mx-auto px-4 max-w-6xl">
+      <!-- Section Header -->
+      <div class="text-center mb-12">
+        <div class="flex items-center gap-2 justify-center mb-4">
+          <div class="h-1 w-12 bg-secondary rounded-full"></div>
+          <h2 class="text-lg font-medium text-secondary">Our Values</h2>
+          <div class="h-1 w-12 bg-secondary rounded-full"></div>
+        </div>
+
+        <h3 class="text-3xl md:text-4xl font-bold">Principles That Guide Us</h3>
+      </div>
+
+      <!-- Values Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Value 1 -->
+        <div
+          class="card bg-base-100 hover:shadow-lg transition-shadow duration-300"
+        >
+          <div class="card-body">
+            <div
+              class="flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-6 mx-auto"
+            >
+              <Icon name="lucide:shield" size={32} class="text-primary" />
+            </div>
+            <h4 class="text-xl font-bold text-center mb-2">Security First</h4>
+            <p class="text-center text-base-content/70">
+              We prioritize the protection of your personal information with
+              end-to-end encryption and secure data practices.
+            </p>
+          </div>
+        </div>
+
+        <!-- Value 2 -->
+        <div
+          class="card bg-base-100 hover:shadow-lg transition-shadow duration-300"
+        >
+          <div class="card-body">
+            <div
+              class="flex items-center justify-center w-16 h-16 rounded-full bg-secondary/10 mb-6 mx-auto"
+            >
+              <Icon name="lucide:sparkles" size={32} class="text-secondary" />
+            </div>
+            <h4 class="text-xl font-bold text-center mb-2">Simplicity</h4>
+            <p class="text-center text-base-content/70">
+              We believe technology should make life easier. Our tools are
+              designed to be intuitive and user-friendly.
+            </p>
+          </div>
+        </div>
+
+        <!-- Value 3 -->
+        <div
+          class="card bg-base-100 hover:shadow-lg transition-shadow duration-300"
+        >
+          <div class="card-body">
+            <div
+              class="flex items-center justify-center w-16 h-16 rounded-full bg-accent/10 mb-6 mx-auto"
+            >
+              <Icon name="lucide:heart" size={32} class="text-accent" />
+            </div>
+            <h4 class="text-xl font-bold text-center mb-2">Community Focus</h4>
+            <p class="text-center text-base-content/70">
+              We build solutions that strengthen connections between people and
+              help in times of need.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact CTA Section -->
+  <section
+    class="py-16 bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10"
+  >
+    <div class="container mx-auto px-4 max-w-4xl text-center">
+      <h2 class="text-3xl md:text-4xl font-bold mb-6">
+        Have Questions? <span class="text-primary">Reach Out to Us</span>
+      </h2>
+
+      <p class="md:text-lg text-base-content/80 mb-8 max-w-2xl mx-auto">
+        We're here to help with any questions you might have about our services.
+        Feel free to get in touch with our friendly team.
+      </p>
+
+      <!-- Contact Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <!-- Email -->
+        <div
+          class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300"
+        >
+          <div class="card-body items-center text-center">
+            <div
+              class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4"
+            >
+              <Icon name="lucide:mail" size={24} class="text-primary" />
+            </div>
+            <h3 class="font-bold text-lg mb-2">Email Us</h3>
+            <p class="text-base-content/70 mb-4">For general inquiries</p>
+            <a
+              href="mailto:contact@personalqr.com"
+              class="text-primary font-medium hover:underline"
+            >
+              contact@personalqr.com
+            </a>
+          </div>
+        </div>
+
+        <!-- Phone -->
+        <div
+          class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300"
+        >
+          <div class="card-body items-center text-center">
+            <div
+              class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center mb-4"
+            >
+              <Icon name="lucide:phone" size={24} class="text-secondary" />
+            </div>
+            <h3 class="font-bold text-lg mb-2">Call Us</h3>
+            <p class="text-base-content/70 mb-4">Monday to Friday, 9am-5pm</p>
+            <a
+              href="tel:+11234567890"
+              class="text-secondary font-medium hover:underline"
+            >
+              +1 (123) 456-7890
+            </a>
+          </div>
+        </div>
+
+        <!-- Office -->
+        <div
+          class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300"
+        >
+          <div class="card-body items-center text-center">
+            <div
+              class="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center mb-4"
+            >
+              <Icon name="lucide:map-pin" size={24} class="text-accent" />
+            </div>
+            <h3 class="font-bold text-lg mb-2">Visit Us</h3>
+            <p class="text-base-content/70 mb-4">Our headquarters</p>
+            <p class="text-accent font-medium">
+              123 Tech Plaza, San Francisco, CA
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-16">
+    <div class="container mx-auto px-4 max-w-4xl">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold mb-6">
+          Frequently Asked Questions
+        </h2>
+        <p class="md:text-lg text-base-content/80 max-w-2xl mx-auto">
+          Find answers to common questions about Personal QR and our services
+        </p>
+      </div>
+
+      <!-- FAQ Accordion -->
+      <div class="join join-vertical w-full">
+        <div class="collapse collapse-arrow join-item border border-base-300">
+          <input type="radio" name="faq-accordion" checked />
+          <div class="collapse-title text-xl font-medium">
+            What types of QR codes does Personal QR offer?
+          </div>
+          <div class="collapse-content">
+            <p>
+              Personal QR offers two main types of QR codes: Profile QR codes
+              for sharing your personal or professional information instantly,
+              and Emergency QR codes that provide immediate access to emergency
+              contacts and a direct communication button to reach
+              administrators.
+            </p>
+          </div>
+        </div>
+
+        <div class="collapse collapse-arrow join-item border border-base-300">
+          <input type="radio" name="faq-accordion" />
+          <div class="collapse-title text-xl font-medium">
+            How secure is my information with Personal QR?
+          </div>
+          <div class="collapse-content">
+            <p>
+              Security is our top priority. All data is encrypted end-to-end,
+              and we use industry-standard security protocols to protect your
+              information. You have full control over what information is
+              displayed when someone scans your QR code.
+            </p>
+          </div>
+        </div>
+
+        <div class="collapse collapse-arrow join-item border border-base-300">
+          <input type="radio" name="faq-accordion" />
+          <div class="collapse-title text-xl font-medium">
+            Do I need a special app to create or scan Personal QR codes?
+          </div>
+          <div class="collapse-content">
+            <p>
+              You don't need any special app to scan our QR codes - they work
+              with any standard smartphone camera or QR code scanner. To create
+              QR codes, you just need to sign up on our website, no additional
+              app installation required.
+            </p>
+          </div>
+        </div>
+
+        <div class="collapse collapse-arrow join-item border border-base-300">
+          <input type="radio" name="faq-accordion" />
+          <div class="collapse-title text-xl font-medium">
+            Can I update my information after creating a QR code?
+          </div>
+          <div class="collapse-content">
+            <p>
+              Yes! One of the benefits of our system is that you can update your
+              information at any time through your account dashboard, and the
+              same QR code will always display your most current information
+              when scanned.
+            </p>
+          </div>
+        </div>
+
+        <div class="collapse collapse-arrow join-item border border-base-300">
+          <input type="radio" name="faq-accordion" />
+          <div class="collapse-title text-xl font-medium">
+            How does the emergency contact feature work?
+          </div>
+          <div class="collapse-content">
+            <p>
+              Our Emergency QR codes display your emergency contacts when
+              scanned and provide a direct communication button that instantly
+              alerts system administrators who can coordinate help. This feature
+              is designed for situations where urgent assistance may be needed.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
