@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { AuthModule } from './module/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './common/prisma/prisma.module';
@@ -10,6 +10,8 @@ import { TokenModule } from '@common/token/token.module';
 import { BullModule } from '@nestjs/bullmq';
 import { OtpModule } from './module/otp/otp.module';
 import { ResetPassMiddleware } from './middleware/resetpass.middleware';
+import { ProfileModule } from './module/profile/profile.module';
+import { VerifyMiddleware } from './middleware/verify.middleware';
 
 @Module({
   imports: [
@@ -29,12 +31,27 @@ import { ResetPassMiddleware } from './middleware/resetpass.middleware';
     AdminModule,
     UserModule,
     TokenModule,
-    OtpModule
+    OtpModule,
+    ProfileModule
   ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(JwtMiddleware).forRoutes('*');
     consumer.apply(ResetPassMiddleware).forRoutes('auth/resetPassword');
+    consumer.apply(VerifyMiddleware).forRoutes(
+      {
+        path: "user/createProfile", method: RequestMethod.POST
+      },
+      {
+        path: "user/updateProfile", method: RequestMethod.PATCH
+      },
+      {
+        path: "user/fetchProfile", method: RequestMethod.GET
+      },
+      {
+        path: "user/delete", method: RequestMethod.DELETE
+      },
+    );
   }
 }

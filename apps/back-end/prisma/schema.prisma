@@ -36,6 +36,36 @@ model User {
   isDeleted Boolean   @default(false)
 
   Otp Otp[]
+
+  Profile Profile[]
+}
+
+enum ProfileType {
+  PUBLIC
+  EMERGENCY
+}
+
+model Profile {
+  id     String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId String      @db.ObjectId @unique()
+  user   User        @relation(fields: [userId], references: [id])
+  type   ProfileType @default(PUBLIC)
+
+  motherName String?
+  fatherName String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Contacts Contacts[]
+}
+
+model Contacts {
+  id                  String  @id @default(auto()) @map("_id") @db.ObjectId
+  profileId           String  @db.ObjectId
+  profile             Profile @relation(fields: [profileId], references: [id])
+  contactPersonName   String
+  contactPersonNumber String
 }
 
 model Otp {

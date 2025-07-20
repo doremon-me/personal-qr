@@ -8,6 +8,14 @@ async function bootstrap() {
 
   app.use(cookieParser(process.env.PARSER_SECRET));
 
+  app.enableCors({
+    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+    credentials: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Accept, Authorization, X-Requested-With',
+    exposedHeaders: 'Set-Cookie',
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
