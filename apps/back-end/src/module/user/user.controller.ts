@@ -5,7 +5,9 @@ import { AuthPayload, VerifiedPayload } from '@common/token/token.service';
 import { ProfileDto } from './dto/profile.dto';
 import { VerifiedInfo } from '@common/decorators/verified.decorator';
 import { UpdateProfileDto } from './dto/updateProfile.dto';
+import { UserSerializer } from './user.serilizer';
 import { Response } from 'express';
+import { plainToInstance } from 'class-transformer';
 
 @Controller('user')
 export class UserController {
@@ -33,7 +35,8 @@ export class UserController {
             throw new UnauthorizedException("User not authenticated");
         }
 
-        return await this.userService.updateProfile(user, updateProfileDto);
+        const userProfile = await this.userService.updateProfile(user, updateProfileDto);
+        return plainToInstance(UserSerializer, userProfile, { excludeExtraneousValues: true })
     }
 
     @Get("fetchProfile")
@@ -46,7 +49,8 @@ export class UserController {
             throw new UnauthorizedException("User not authenticated");
         }
 
-        return await this.userService.fetchProfile(user);
+        const profileInfo = await this.userService.fetchProfile(user);
+        return plainToInstance(UserSerializer, profileInfo, { excludeExtraneousValues: true })
     }
 
     @Delete("delete")

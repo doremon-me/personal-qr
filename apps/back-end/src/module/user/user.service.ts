@@ -5,7 +5,7 @@ import { CreateUserDto } from './dto/create.dto';
 import { hashPassword } from '@common/utils/hash.util';
 import { UserDto } from './dto/user.dto';
 import { ProfileDto } from './dto/profile.dto';
-import { ProfileType } from '@generated/prisma';
+import { User } from '@generated/prisma';
 import { AuthPayload } from '@common/token/token.service';
 import { UpdateProfileDto } from './dto/updateProfile.dto';
 
@@ -129,11 +129,26 @@ export class UserService {
         });
         if (!checkProfile) throw new NotFoundException('Profile not found');
 
-        const contactsToUpdate = (updateData.contacts || []).filter(c => c.id);
-        const contactsToCreate = (updateData.contacts || []).filter(c => !c.id);
+        const userUpdate: any = {};
+        if (updateData.email) userUpdate.email = updateData.email;
+        if (updateData.number) userUpdate.number = updateData.number;
+        if (updateData.name) userUpdate.name = updateData.name;
 
         try {
-            return await this.prismaService.profile.update({
+            let userDetails: User;
+            if (Object.keys(userUpdate).length > 0) {
+                userDetails = await this.prismaService.user.update({
+                    where: { id: user.id },
+                    data: userUpdate,
+                });
+            } else {
+                userDetails = await this.prismaService.user.update({
+                    where: { id: user.id },
+                    data: { updatedAt: new Date() }
+                });
+            }
+
+            const userProfile = await this.prismaService.profile.update({
                 where: { id: checkProfile.id },
                 data: {
                     type: updateData.type || checkProfile.type,
@@ -142,25 +157,23 @@ export class UserService {
                     updatedAt: new Date(),
                     ...(updateData.contacts && {
                         Contacts: {
-                            ...(contactsToUpdate.length > 0 && {
-                                updateMany: contactsToUpdate.map(contact => ({
-                                    where: { id: contact.id },
-                                    data: {
-                                        contactPersonName: contact.contactPersonName,
-                                        contactPersonNumber: contact.contactPersonNumber,
-                                    }
-                                }))
-                            }),
-                            ...(contactsToCreate.length > 0 && {
-                                create: contactsToCreate.map(contact => ({
-                                    contactPersonName: contact.contactPersonName,
-                                    contactPersonNumber: contact.contactPersonNumber,
-                                }))
-                            })
+                            deleteMany: {},
+                            create: updateData.contacts.map(contact => ({
+                                contactPersonName: contact.contactPersonName,
+                                contactPersonNumber: contact.contactPersonNumber,
+                            })),
                         }
                     })
+                },
+                include: {
+                    Contacts: true
                 }
             });
+
+            return {
+                ...userDetails,
+                ...userProfile,
+            }
         } catch (error) {
             throw new InternalServerErrorException('Error updating profile');
         }
@@ -186,7 +199,11 @@ export class UserService {
             }
         });
         if (!profile) throw new NotFoundException('Profile not found');
-        return profile;
+        const { createdAt, updatedAt, type, ...userProfile } = profile;
+        return {
+            ...checkUser,
+            ...userProfile,
+        }
     }
 
     async deleteUser(user: AuthPayload) {
