@@ -35,7 +35,8 @@ export class UserController {
             throw new UnauthorizedException("User not authenticated");
         }
 
-        return await this.userService.updateProfile(user, updateProfileDto);
+        const userProfile = await this.userService.updateProfile(user, updateProfileDto);
+        return plainToInstance(UserSerializer, userProfile, { excludeExtraneousValues: true })
     }
 
     @Get("fetchProfile")
@@ -49,20 +50,7 @@ export class UserController {
         }
 
         const profileInfo = await this.userService.fetchProfile(user);
-        return plainToInstance(UserSerializer, {
-            id: profileInfo.user.id,
-            profileId: profileInfo.profile.id,
-            name: profileInfo.user.name,
-            email: profileInfo.user.email,
-            number: profileInfo.user.number,
-            fatherName: profileInfo.profile.fatherName,
-            motherName: profileInfo.profile.motherName,
-            Contacts: profileInfo.profile.Contacts.map(contact => ({
-                id: contact.id,
-                contactPersonName: contact.contactPersonName,
-                contactPersonNumber: contact.contactPersonNumber
-            }))
-        }, { excludeExtraneousValues: true })
+        return plainToInstance(UserSerializer, profileInfo, { excludeExtraneousValues: true })
     }
 
     @Delete("delete")

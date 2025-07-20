@@ -29,6 +29,12 @@ export class UserSerializer {
         contactPersonNumber: string;
     }>
 
+    @Expose()
+    createdAt: Date;
+
+    @Expose()
+    updatedAt: Date;
+
     constructor(partial: Partial<UserSerializer>) {
         Object.assign(this, partial);
     }
