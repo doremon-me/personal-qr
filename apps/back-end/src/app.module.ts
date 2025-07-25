@@ -12,6 +12,7 @@ import { OtpModule } from './module/otp/otp.module';
 import { ResetPassMiddleware } from './middleware/resetpass.middleware';
 import { ProfileModule } from './module/profile/profile.module';
 import { VerifyMiddleware } from './middleware/verify.middleware';
+import { QrModule } from './module/qr/qr.module';
 
 @Module({
   imports: [
@@ -32,7 +33,8 @@ import { VerifyMiddleware } from './middleware/verify.middleware';
     UserModule,
     TokenModule,
     OtpModule,
-    ProfileModule
+    ProfileModule,
+    QrModule
   ],
 })
 export class AppModule implements NestModule {

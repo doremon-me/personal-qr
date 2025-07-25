@@ -241,4 +241,24 @@ export class UserService {
             throw new InternalServerErrorException('Error deleting user and related data');
         }
     }
+
+    async getUserById(id: string) {
+        const findOneDto = {
+            id: id,
+            email: "",
+            number: "",
+            validateFields: {
+                id: true,
+                email: false,
+                number: false
+            }
+        }
+        try {
+            return await this.prismaService.profile.findUnique({
+                where: { id },
+            });
+        } catch (error) {
+            throw new InternalServerErrorException('Error fetching user by ID');
+        }
+    }
 }
