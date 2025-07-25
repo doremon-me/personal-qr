@@ -21,6 +21,10 @@ declare global {
             WHATSAPP_API: string;
             WHATSAPP_API_KEY: string;
 
+            QUICK_SMS_API_KEY: string;
+            OTP_SMS_API_KEY: string;
+            SMS_API_URL: string;
+
             ZOHO_EMAIL: string;
             ZOHO_PASSWORD: string;
         }
