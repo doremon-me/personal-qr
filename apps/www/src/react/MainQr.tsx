@@ -253,6 +253,17 @@ const MainQr = () => {
   };
 
   const onSubmit = async (data: QrFormData) => {
+    // Only validate required fields (mother and father name)
+    if (!data.motherName?.trim()) {
+      alert("Please enter your mother's name");
+      return;
+    }
+    
+    if (!data.fatherName?.trim()) {
+      alert("Please enter your father's name");
+      return;
+    }
+
     setIsLoading(true);
 
     const filteredContacts = data.contacts.filter(
@@ -266,9 +277,7 @@ const MainQr = () => {
       contacts: filteredContacts,
     };
 
-    console.log("QR Form Data:", formData);
-
-    try {
+    console.log("QR Form Data:", formData);    try {
       let profileResponse: ProfileData | null = null;
       const dataChanged = hasDataChanged(formData);
 
@@ -282,9 +291,9 @@ const MainQr = () => {
       if (existingProfile && dataChanged) {
         const updateData = {
           id: existingProfile.id,
-          name: data.name,
-          email: data.email,
-          number: data.phone,
+          ...(data.name?.trim() && { name: data.name.trim() }),
+          ...(data.email?.trim() && { email: data.email.trim() }),
+          ...(data.phone?.trim() && { number: data.phone.trim() }),
           motherName: data.motherName,
           fatherName: data.fatherName,
           contacts: filteredContacts,
@@ -299,9 +308,9 @@ const MainQr = () => {
         );
       } else if (!existingProfile) {
         const profileData = {
-          name: data.name,
-          email: data.email,
-          number: data.phone,
+          ...(data.name?.trim() && { name: data.name.trim() }),
+          ...(data.email?.trim() && { email: data.email.trim() }),
+          ...(data.phone?.trim() && { number: data.phone.trim() }),
           motherName: data.motherName,
           fatherName: data.fatherName,
           contacts: filteredContacts,
@@ -316,7 +325,9 @@ const MainQr = () => {
 
       await generateQRCode(formData);
 
+      // After QR generation, fetch the latest profile data
       if (profileResponse) {
+        console.log("Fetching latest profile data after QR generation...");
         await refreshProfile();
       }
 
@@ -463,18 +474,17 @@ const MainQr = () => {
                   <div className="form-control">
                     <label className="label">
                       <span className="label-text font-medium">
-                        Full Name *
+                        Full Name
                       </span>
                     </label>
                     <div className="relative">
                       <input
                         type="text"
-                        placeholder="Enter your full name"
+                        placeholder="Enter your full name (optional)"
                         className={`input input-bordered w-full pl-12 focus:input-primary ${
                           errors.name ? "input-error" : ""
                         }`}
                         {...register("name", {
-                          required: "Full name is required",
                           minLength: {
                             value: 2,
                             message: "Name must be at least 2 characters",
@@ -507,17 +517,16 @@ const MainQr = () => {
                   {/* Email */}
                   <div className="form-control">
                     <label className="label">
-                      <span className="label-text font-medium">Email *</span>
+                      <span className="label-text font-medium">Email</span>
                     </label>
                     <div className="relative">
                       <input
                         type="email"
-                        placeholder="Enter your email address"
+                        placeholder="Enter your email address (optional)"
                         className={`input input-bordered w-full pl-12 focus:input-primary ${
                           errors.email ? "input-error" : ""
                         }`}
                         {...register("email", {
-                          required: "Email is required",
                           pattern: {
                             value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                             message: "Please enter a valid email address",
@@ -552,18 +561,17 @@ const MainQr = () => {
                 <div className="form-control">
                   <label className="label">
                     <span className="label-text font-medium">
-                      Phone Number *
+                      Phone Number
                     </span>
                   </label>
                   <div className="relative">
                     <input
                       type="tel"
-                      placeholder="Enter your phone number"
+                      placeholder="Enter your phone number (optional)"
                       className={`input input-bordered w-full pl-12 focus:input-primary ${
                         errors.phone ? "input-error" : ""
                       }`}
                       {...register("phone", {
-                        required: "Phone number is required",
                         pattern: {
                           value: /^[+]?[(]?\d{10,15}$/,
                           message: "Please enter a valid phone number",
@@ -896,7 +904,11 @@ const MainQr = () => {
                   className={`btn btn-primary flex-1 order-1 sm:order-2 ${
                     isLoading ? "loading" : ""
                   }`}
-                  disabled={isLoading || !isValid}
+                  disabled={
+                    isLoading || 
+                    !watchedMotherName?.trim() || 
+                    !watchedFatherName?.trim()
+                  }
                 >
                   {isLoading ? (
                     <>
