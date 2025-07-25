@@ -9,6 +9,8 @@ const ENDPOINT = {
   crateProfile: "/user/createProfile",
   updateProfile: "/user/updateProfile",
   getProfile: "/user/fetchProfile",
+  scanQr: "/qr/scan",
+  verifyProfile: "/qr/verify",
 };
 
 interface SignupFormData {
@@ -57,6 +59,15 @@ interface UpdateProfileData {
   motherName?: string;
   fatherName?: string;
   contacts?: Contact[];
+}
+
+interface ScanQr {
+  number: string;
+}
+
+interface VerifyProfile {
+  number: string;
+  otp: string;
 }
 
 export const userSignUp = async (data: SignupFormData) => {
@@ -125,6 +136,26 @@ export const updateProfile = async (data: UpdateProfileData) => {
 export const getProfile = async () => {
   try {
     const response = await apiClient.get(ENDPOINT.getProfile);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const scanQr = async (id: string, data: ScanQr) => {
+  try {
+    const response = await apiClient.post(ENDPOINT.scanQr, data, {
+      params: { id },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const verifyProfile = async (data: VerifyProfile) => {
+  try {
+    const response = await apiClient.post(ENDPOINT.verifyProfile, data);
     return response.data;
   } catch (error) {
     throw error;

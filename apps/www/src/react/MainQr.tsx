@@ -220,22 +220,23 @@ const MainQr = () => {
 
   const generateQRCode = async (formData: QrFormData) => {
     try {
-      const qrData = {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        motherName: formData.motherName,
-        fatherName: formData.fatherName,
-        contacts: formData.contacts.filter(
-          (contact) =>
-            contact.contactPersonName.trim() !== "" ||
-            contact.contactPersonNumber.trim() !== ""
-        ),
-      };
+      // Use only the profile ID in QR code if profile exists - make it a URL
+      const qrData = existingProfile
+        ? `http://localhost:4321/qr/scan?id=${existingProfile.id}`
+        : JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            motherName: formData.motherName,
+            fatherName: formData.fatherName,
+            contacts: formData.contacts.filter(
+              (contact) =>
+                contact.contactPersonName.trim() !== "" ||
+                contact.contactPersonNumber.trim() !== ""
+            ),
+          });
 
-      const qrString = JSON.stringify(qrData);
-
-      const qrCodeDataURL = await QRCode.toDataURL(qrString, {
+      const qrCodeDataURL = await QRCode.toDataURL(qrData, {
         width: 300,
         margin: 2,
         color: {
