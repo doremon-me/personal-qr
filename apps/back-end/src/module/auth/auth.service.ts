@@ -15,7 +15,7 @@ import { ResetPassDto } from './dto/resetpass.dto';
 
 @Injectable()
 export class AuthService {
-    constructor(private readonly adminService: AdminService, private readonly userService: UserService, @InjectQueue("whatsapp-queue") private whatsappQueue: Queue, @InjectQueue("email-queue") private emailQueue: Queue, private readonly otpService: OtpService) { }
+    constructor(private readonly adminService: AdminService, private readonly userService: UserService, @InjectQueue("email-queue") private emailQueue: Queue, @InjectQueue('sms-queue') private smsQueue: Queue, private readonly otpService: OtpService) { }
     async adminSignin(adminSigninDto: AdminSigninDto) {
         const admin = await this.adminService.findOne({ number: adminSigninDto.number, id: "", validateFields: { id: false, number: true } });
         if (!admin) {
@@ -51,7 +51,7 @@ export class AuthService {
         const otp = await this.otpService.generateOtp({ type: "verification", userId: user.id });
 
         if (userSignupDto.number) {
-            await this.whatsappQueue.add('send-verification-otp', {
+            await this.smsQueue.add('send-verification-otp', {
                 type: otp.type,
                 userId: user.id,
                 otp: otp.otp,
@@ -105,7 +105,7 @@ export class AuthService {
         if (userSigninDto.number && !user.isNumberVerified) {
             const otp = await this.otpService.generateOtp({ type: "verification", userId: user.id });
             if (userSigninDto.number) {
-                await this.whatsappQueue.add('send-verification-otp', {
+                await this.smsQueue.add('send-verification-otp', {
                     type: otp.type,
                     userId: user.id,
                     otp: otp.otp,
@@ -151,7 +151,7 @@ export class AuthService {
         }
         const otp = await this.otpService.generateOtp({ type: "forget-password", userId: user.id });
         if (forgetPassDto.number) {
-            await this.whatsappQueue.add('send-forget-password-otp', {
+            await this.smsQueue.add('send-forget-password-otp', {
                 type: otp.type,
                 userId: user.id,
                 otp: otp.otp,

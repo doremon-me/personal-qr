@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Patch, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserAuth } from '@common/decorators/userAuth.decorator';
 import { AuthPayload, VerifiedPayload } from '@common/token/token.service';
@@ -8,10 +8,13 @@ import { UpdateProfileDto } from './dto/updateProfile.dto';
 import { UserSerializer } from './user.serilizer';
 import { Response } from 'express';
 import { plainToInstance } from 'class-transformer';
+import { VerifyDto } from './dto/verify.dto';
+import { Queue } from 'bullmq';
+import { InjectQueue } from '@nestjs/bullmq';
 
 @Controller('user')
 export class UserController {
-    constructor(private readonly userService: UserService) { }
+    constructor(private readonly userService: UserService, @InjectQueue('sms-queue') private smsQueue: Queue) { }
 
     @Post("createProfile")
     async createProfile(@VerifiedInfo() verifiedInfo: VerifiedPayload, @UserAuth() user: AuthPayload, @Body() createProfileDto: ProfileDto) {
@@ -67,5 +70,11 @@ export class UserController {
         res.clearCookie("__verified");
 
         return await this.userService.deleteUser(user);
+    }
+
+    @Post(":id")
+    async getUser(@Body() body: VerifyDto, @Param('id') id: string) {
+        const { number } = body;
+        const user = await this.userService.getUserById(id);
     }
 }
