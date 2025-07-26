@@ -222,7 +222,7 @@ const MainQr = () => {
     try {
       // Use only the profile ID in QR code if profile exists - make it a URL
       const qrData = existingProfile
-        ? `http://localhost:4321/qr/scan?id=${existingProfile.id}`
+        ? `https://prqr.in/qr/scan?id=${existingProfile.id}`
         : JSON.stringify({
             name: formData.name,
             email: formData.email,
