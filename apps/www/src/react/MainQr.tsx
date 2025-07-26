@@ -308,9 +308,7 @@ const MainQr = () => {
         );
       } else if (!existingProfile) {
         const profileData = {
-          ...(data.name?.trim() && { name: data.name.trim() }),
-          ...(data.email?.trim() && { email: data.email.trim() }),
-          ...(data.phone?.trim() && { number: data.phone.trim() }),
+         
           motherName: data.motherName,
           fatherName: data.fatherName,
           contacts: filteredContacts,
