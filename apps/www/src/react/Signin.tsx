@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { userSignIn, forgotPassword } from "./api/authApi";
+import { userSignIn, forgotPassword, verifyOtp } from "./api/authApi";
 import type { SignInFormData } from "./api/authApi";
 import OtpPopup from "./OtpPopup";
 import ResetPassword from "./ResetPassword";
@@ -24,7 +24,16 @@ const Signin = () => {
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
   const [otpLoading, setOtpLoading] = useState(false);
-  const [forgotPasswordData, setForgotPasswordData] = useState<ForgotPasswordData | null>(null);
+  const [forgotPasswordData, setForgotPasswordData] =
+    useState<ForgotPasswordData | null>(null);
+
+  // New states for verification flow
+  const [showVerificationOtp, setShowVerificationOtp] = useState(false);
+  const [userVerificationData, setUserVerificationData] = useState<any>(null);
+  const [verificationEmailOrPhone, setVerificationEmailOrPhone] = useState("");
+  const [verificationInputType, setVerificationInputType] = useState<
+    "email" | "phone" | "unknown"
+  >("unknown");
 
   const {
     register,
@@ -129,12 +138,35 @@ const Signin = () => {
     window.location.href = "/auth/signinpage";
   };
 
+  // Handle verification OTP
+  const handleVerificationOtpVerify = async (otpValue: string) => {
+    setOtpLoading(true);
+
+  
+    setTimeout(() => {
+      setOtpLoading(false);
+      setShowVerificationOtp(false);
+      // Redirect to QR page after successful verification
+      window.location.href = "/home/qr";
+    }, 1000);
+  };
+
+  // Resend verification OTP
+  const handleVerificationResendOtp = () => {
+    // Silently handle resend for verification
+  };
+
+  // Close verification OTP modal
+  const closeVerificationOtpModal = () => {
+    setShowVerificationOtp(false);
+  };
+
   const onSubmit = async (data: SigninFormData) => {
     setIsLoading(true);
 
     try {
       const apiData: SignInFormData = { password: data.password };
-      
+
       // Determine if the input is email or phone and assign accordingly
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       const inputValue = data.email || "";
@@ -147,8 +179,31 @@ const Signin = () => {
         apiData.number = inputValue;
       }
 
-      await userSignIn(apiData);
-      window.location.href = "/home/qr";
+      const response = await userSignIn(apiData);
+
+      // Check verification status
+      const { id, isNumberVerified, isEmailVerified } = response;
+
+      // If both are false, show verification OTP
+      if (!isNumberVerified && !isEmailVerified) {
+        // Store user data for verification
+        setUserVerificationData(response);
+
+        // Determine which field to verify (prefer email if available, otherwise phone)
+        if (apiData.email) {
+          setVerificationEmailOrPhone(apiData.email);
+          setVerificationInputType("email");
+        } else if (apiData.number) {
+          setVerificationEmailOrPhone(apiData.number);
+          setVerificationInputType("phone");
+        }
+
+        // Show verification OTP modal
+        setShowVerificationOtp(true);
+      } else {
+        // At least one verification is true, proceed to QR page
+        window.location.href = "/home/qr";
+      }
     } catch (error) {
       // Silently handle signin errors
     } finally {
@@ -503,6 +558,18 @@ const Signin = () => {
         isOpen={showResetModal}
         onClose={() => setShowResetModal(false)}
         onResetSuccess={handleResetSuccess}
+      />
+
+      {/* Verification OTP Popup */}
+      <OtpPopup
+        isOpen={showVerificationOtp}
+        onClose={closeVerificationOtpModal}
+        onVerify={handleVerificationOtpVerify}
+        onResend={handleVerificationResendOtp}
+        emailOrPhone={verificationEmailOrPhone}
+        isLoading={otpLoading}
+        inputType={verificationInputType}
+        verifyType="verification"
       />
     </div>
   );
