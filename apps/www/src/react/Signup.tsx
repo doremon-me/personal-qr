@@ -37,10 +37,9 @@ const Signup = () => {
 
   const password = watch("password");
 
-  // Function to detect if input is email or phone
   const detectInputType = (value: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    // Normalize phone input (remove spaces, dashes, parentheses)
+
     const normalizedValue = value.replace(/[\s\-\(\)]/g, "");
     const phoneRegex = /^[+]?[(]?\d{10,15}$/;
 
@@ -53,17 +52,14 @@ const Signup = () => {
     }
   };
 
-  // Submit signup form (opens OTP modal)
   const onSubmit = async (data: SignupFormData) => {
     setIsLoading(true);
 
-    // Prepare the data based on input type
     const submitData: SignupFormData = {
       name: data.name,
       password: data.password,
     };
 
-    // Determine if the input is email or phone and assign accordingly
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const inputValue = data.email || "";
     const normalizedValue = inputValue.replace(/[\s\-\(\)]/g, "");
@@ -81,23 +77,19 @@ const Signup = () => {
       await userSignUp(submitData);
       setShowOtpModal(true);
     } catch (error) {
-      // Silently handle signup errors, still show OTP modal for better UX
       setShowOtpModal(true);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Verify OTP and complete signup
   const handleOtpVerify = async (otpValue: string) => {
     setOtpLoading(true);
 
-    // The actual OTP verification is handled by the OtpPopup component
-    // This is called after successful verification
     setTimeout(() => {
       setOtpLoading(false);
       setShowOtpModal(false);
-      // Redirect to home page
+
       window.location.href = "/home/qr";
     }, 1000);
   };

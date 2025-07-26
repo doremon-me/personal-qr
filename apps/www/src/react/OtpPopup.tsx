@@ -23,6 +23,8 @@ const OtpPopup: React.FC<OtpPopupProps> = ({
   verifyType = "verification",
 }) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [error, setError] = useState<string>("");
+  const [isVerifying, setIsVerifying] = useState(false);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   // Handle OTP input change
@@ -31,6 +33,11 @@ const OtpPopup: React.FC<OtpPopupProps> = ({
       const newOtp = [...otp];
       newOtp[index] = value;
       setOtp(newOtp);
+
+      // Clear error when user starts typing
+      if (error) {
+        setError("");
+      }
 
       // Auto-focus next input
       if (value && index < 5) {
@@ -58,12 +65,15 @@ const OtpPopup: React.FC<OtpPopupProps> = ({
   };
 
   // Handle verify button click
-
   const handleVerify = async () => {
     const otpValue = otp.join("");
     if (otpValue.length !== 6) {
+      setError("Please enter all 6 digits");
       return;
     }
+
+    setIsVerifying(true);
+    setError("");
 
     const payload = {
       type: verifyType,
@@ -74,30 +84,47 @@ const OtpPopup: React.FC<OtpPopupProps> = ({
           ? { number: emailOrPhone }
           : {}),
     };
+
     try {
       const response = await verifyOtp(payload);
+      setIsVerifying(false);
+
+      // Call onVerify to let parent handle the response
+      // Parent will check the verification status and decide whether to redirect
       onVerify(otpValue);
-      
-      // Only redirect to home for signup verification, not for forgot password
-      if (verifyType === "verification") {
-        window.location.href = "/home/qr";
-      }
-    } catch (error) {
-      // Silently handle OTP verification errors
-      // Still call onVerify to proceed with the flow
-      onVerify(otpValue);
+
+      // Don't auto-redirect here - let the parent components handle it
+      // This allows proper response checking in both signin and signup flows
+    } catch (error: any) {
+      setIsVerifying(false);
+
+      // Don't call onVerify when verification fails
+      console.error("OTP verification failed:", error);
+
+      // Show error message to user
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Invalid OTP. Please try again.";
+      setError(errorMessage);
+
+      // Clear the OTP inputs so user can try again
+      setOtp(["", "", "", "", "", ""]);
+      otpRefs.current[0]?.focus();
     }
   };
 
   // Handle resend OTP
   const handleResend = () => {
     setOtp(["", "", "", "", "", ""]);
+    setError("");
     onResend();
   };
 
   // Close modal and reset OTP
   const handleClose = () => {
     setOtp(["", "", "", "", "", ""]);
+    setError("");
     onClose();
   };
 
@@ -132,10 +159,16 @@ const OtpPopup: React.FC<OtpPopupProps> = ({
             </svg>
           </div>
           <h3 className="text-2xl font-bold mb-2">
-            {verifyType === "forget-password" ? "Reset Password" : "Verify Your Account"}
+            {verifyType === "forget-password"
+              ? "Reset Password"
+              : "Verify Your Account"}
           </h3>
           <p className="text-base-content/70">
-            We've sent a 6-digit {verifyType === "forget-password" ? "password reset" : "verification"} code to
+            We've sent a 6-digit{" "}
+            {verifyType === "forget-password"
+              ? "password reset"
+              : "verification"}{" "}
+            code to
             <br />
             <span className="font-semibold text-primary">{emailOrPhone}</span>
           </p>
@@ -163,20 +196,40 @@ const OtpPopup: React.FC<OtpPopupProps> = ({
                 value={digit}
                 onChange={(e) => handleOtpChange(index, e.target.value)}
                 onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                className="input input-bordered w-12 h-12 text-center text-lg font-bold focus:input-primary"
+                className={`input input-bordered w-12 h-12 text-center text-lg font-bold focus:input-primary ${error ? "input-error" : ""}`}
                 placeholder="0"
               />
             ))}
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="alert alert-error text-sm mb-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="stroke-current shrink-0 h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span>{error}</span>
+            </div>
+          )}
         </div>
 
         {/* Verify Button */}
         <button
           onClick={handleVerify}
-          className={`btn btn-primary w-full mb-4 ${isLoading ? "loading" : ""}`}
-          disabled={isLoading || otp.join("").length !== 6}
+          className={`btn btn-primary w-full mb-4 ${isVerifying ? "loading" : ""}`}
+          disabled={isVerifying || otp.join("").length !== 6}
         >
-          {isLoading ? (
+          {isVerifying ? (
             <>
               <span className="loading loading-spinner loading-sm"></span>
               Verifying...
@@ -196,7 +249,9 @@ const OtpPopup: React.FC<OtpPopupProps> = ({
                   d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              {verifyType === "forget-password" ? "Verify & Reset Password" : "Verify & Create Account"}
+              {verifyType === "forget-password"
+                ? "Verify & Reset Password"
+                : "Verify Account"}
             </>
           )}
         </button>
