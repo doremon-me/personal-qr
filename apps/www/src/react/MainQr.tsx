@@ -1,21 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import useAuth from "./hooks/useAuth";
+import { crateProfile, getProfile, updateProfile } from "./api/authApi";
 import * as QRCode from "qrcode";
 
 interface Contact {
-  name: string;
-  number: string;
+  id?: string;
+  contactPersonName: string;
+  contactPersonNumber: string;
 }
 
 interface QrFormData {
-  name: string;
-  email: string;
-  phone: string;
+  name?: string;
+  email?: string;
+  phone?: string;
   motherName: string;
   fatherName: string;
-  photo: FileList | null;
   contacts: Contact[];
+}
+
+interface ProfileData {
+  id: string;
+  name: string;
+  email: string;
+  number: string | null;
+  userId: string;
+  type?: string;
+  motherName: string;
+  fatherName: string;
+  createdAt: string;
+  updatedAt: string;
+  Contacts: Contact[];
 }
 
 const MainQr = () => {
@@ -23,6 +38,10 @@ const MainQr = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [qrCodeImage, setQrCodeImage] = useState<string | null>(null);
+  const [existingProfile, setExistingProfile] = useState<ProfileData | null>(
+    null
+  );
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
   const {
     register,
@@ -30,6 +49,8 @@ const MainQr = () => {
     control,
     formState: { errors, isValid },
     watch,
+    setValue,
+    reset,
   } = useForm<QrFormData>({
     mode: "onChange",
     defaultValues: {
@@ -38,8 +59,7 @@ const MainQr = () => {
       phone: "",
       motherName: "",
       fatherName: "",
-      photo: null,
-      contacts: [{ name: "", number: "" }],
+      contacts: [{ contactPersonName: "", contactPersonNumber: "" }],
     },
   });
 
@@ -49,8 +69,119 @@ const MainQr = () => {
   });
 
   const watchedContacts = watch("contacts");
+  const watchedMotherName = watch("motherName");
+  const watchedFatherName = watch("fatherName");
+  const watchedName = watch("name");
+  const watchedEmail = watch("email");
+  const watchedPhone = watch("phone");
 
-  if (!isLoaded) {
+  const hasDataChanged = useCallback(
+    (formData: QrFormData) => {
+      if (!existingProfile) return true;
+
+      // Compare personal information
+      if (formData.name !== existingProfile.name) return true;
+      if (formData.email !== existingProfile.email) return true;
+      if (formData.phone !== existingProfile.number) return true;
+      if (formData.motherName !== existingProfile.motherName) return true;
+      if (formData.fatherName !== existingProfile.fatherName) return true;
+
+      // Compare contacts
+      const existingContacts = existingProfile.Contacts || [];
+      const newContacts = formData.contacts.filter(
+        (contact) =>
+          contact.contactPersonName.trim() !== "" ||
+          contact.contactPersonNumber.trim() !== ""
+      );
+
+      if (existingContacts.length !== newContacts.length) return true;
+
+      for (let i = 0; i < existingContacts.length; i++) {
+        const existing = existingContacts[i];
+        const updated = newContacts[i];
+
+        if (!updated) return true;
+
+        if (existing.contactPersonName !== updated.contactPersonName)
+          return true;
+        if (existing.contactPersonNumber !== updated.contactPersonNumber)
+          return true;
+      }
+
+      return false;
+    },
+    [existingProfile]
+  );
+
+  const currentDataChanged = useMemo(() => {
+    if (!existingProfile) return false;
+
+    const currentData: QrFormData = {
+      name: watchedName || "",
+      email: watchedEmail || "",
+      phone: watchedPhone || "",
+      motherName: watchedMotherName || "",
+      fatherName: watchedFatherName || "",
+      contacts: watchedContacts || [],
+    };
+
+    return hasDataChanged(currentData);
+  }, [
+    existingProfile,
+    watchedName,
+    watchedEmail,
+    watchedPhone,
+    watchedMotherName,
+    watchedFatherName,
+    watchedContacts,
+    hasDataChanged,
+  ]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadExistingProfile();
+    }
+  }, [isAuthenticated]);
+
+  const loadExistingProfile = async () => {
+    try {
+      setIsLoadingProfile(true);
+      const profileData = await getProfile();
+      console.log("Existing profile data:", profileData);
+
+      if (profileData) {
+        setExistingProfile(profileData);
+
+        // Populate personal information fields
+        setValue("name", profileData.name || "");
+        setValue("email", profileData.email || "");
+        setValue("phone", profileData.number || "");
+        setValue("motherName", profileData.motherName || "");
+        setValue("fatherName", profileData.fatherName || "");
+
+        if (profileData.Contacts && profileData.Contacts.length > 0) {
+          const formattedContacts = profileData.Contacts.map(
+            (contact: any) => ({
+              id: contact.id,
+              contactPersonName: contact.contactPersonName || "",
+              contactPersonNumber: contact.contactPersonNumber || "",
+            })
+          );
+          setValue("contacts", formattedContacts);
+        }
+      }
+    } catch (error) {
+      console.log("No existing profile found or error loading profile:", error);
+    } finally {
+      setIsLoadingProfile(false);
+    }
+  };
+
+  const refreshProfile = async () => {
+    await loadExistingProfile();
+  };
+
+  if (!isLoaded || isLoadingProfile) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="loading loading-spinner loading-lg"></div>
@@ -67,7 +198,7 @@ const MainQr = () => {
   console.log("User Data:", userData);
 
   const addContact = () => {
-    append({ name: "", number: "" });
+    append({ contactPersonName: "", contactPersonNumber: "" });
   };
 
   const removeContact = (index: number) => {
@@ -87,27 +218,25 @@ const MainQr = () => {
     }
   };
 
-  // Generate QR Code from form data
   const generateQRCode = async (formData: QrFormData) => {
     try {
-      // Create QR data object
-      const qrData = {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        motherName: formData.motherName,
-        fatherName: formData.fatherName,
-        contacts: formData.contacts.filter(
-          (contact) =>
-            contact.name.trim() !== "" || contact.number.trim() !== ""
-        ),
-      };
+      // Use only the profile ID in QR code if profile exists - make it a URL
+      const qrData = existingProfile
+        ? `http://localhost:4321/qr/scan?id=${existingProfile.id}`
+        : JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            motherName: formData.motherName,
+            fatherName: formData.fatherName,
+            contacts: formData.contacts.filter(
+              (contact) =>
+                contact.contactPersonName.trim() !== "" ||
+                contact.contactPersonNumber.trim() !== ""
+            ),
+          });
 
-      // Convert to JSON string
-      const qrString = JSON.stringify(qrData);
-
-      // Generate QR code
-      const qrCodeDataURL = await QRCode.toDataURL(qrString, {
+      const qrCodeDataURL = await QRCode.toDataURL(qrData, {
         width: 300,
         margin: 2,
         color: {
@@ -123,13 +252,24 @@ const MainQr = () => {
     }
   };
 
-  // Handle form submission
   const onSubmit = async (data: QrFormData) => {
+    // Only validate required fields (mother and father name)
+    if (!data.motherName?.trim()) {
+      alert("Please enter your mother's name");
+      return;
+    }
+    
+    if (!data.fatherName?.trim()) {
+      alert("Please enter your father's name");
+      return;
+    }
+
     setIsLoading(true);
 
-    // Filter out empty contacts
     const filteredContacts = data.contacts.filter(
-      (contact) => contact.name.trim() !== "" || contact.number.trim() !== ""
+      (contact) =>
+        contact.contactPersonName.trim() !== "" ||
+        contact.contactPersonNumber.trim() !== ""
     );
 
     const formData = {
@@ -137,16 +277,75 @@ const MainQr = () => {
       contacts: filteredContacts,
     };
 
-    console.log("QR Form Data:", formData);
+    console.log("QR Form Data:", formData);    try {
+      let profileResponse: ProfileData | null = null;
+      const dataChanged = hasDataChanged(formData);
 
-    try {
-      // Generate QR Code
+      if (existingProfile && !dataChanged) {
+        console.log("No changes detected, regenerating QR code only");
+        await generateQRCode(formData);
+        setIsLoading(false);
+        return;
+      }
+
+      if (existingProfile && dataChanged) {
+        const updateData = {
+          id: existingProfile.id,
+          ...(data.name?.trim() && { name: data.name.trim() }),
+          ...(data.email?.trim() && { email: data.email.trim() }),
+          ...(data.phone?.trim() && { number: data.phone.trim() }),
+          motherName: data.motherName,
+          fatherName: data.fatherName,
+          contacts: filteredContacts,
+        };
+
+        console.log("Data changed, updating profile:", updateData);
+        profileResponse = await updateProfile(updateData);
+        console.log("Profile updated successfully:", profileResponse);
+
+        setExistingProfile((prev) =>
+          prev ? { ...prev, ...profileResponse } : profileResponse
+        );
+      } else if (!existingProfile) {
+        const profileData = {
+          ...(data.name?.trim() && { name: data.name.trim() }),
+          ...(data.email?.trim() && { email: data.email.trim() }),
+          ...(data.phone?.trim() && { number: data.phone.trim() }),
+          motherName: data.motherName,
+          fatherName: data.fatherName,
+          contacts: filteredContacts,
+        };
+
+        console.log("Creating new profile data:", profileData);
+        profileResponse = await crateProfile(profileData);
+        console.log("Profile created successfully:", profileResponse);
+
+        setExistingProfile(profileResponse);
+      }
+
       await generateQRCode(formData);
 
+      // After QR generation, fetch the latest profile data
+      if (profileResponse) {
+        console.log("Fetching latest profile data after QR generation...");
+        await refreshProfile();
+      }
+
       setIsLoading(false);
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false);
-      alert("Failed to generate QR code. Please try again.");
+      console.error("Error:", error);
+
+      if (error.response?.data?.message) {
+        alert(`Error: ${error.response.data.message}`);
+      } else if (error.message) {
+        alert(`Error: ${error.message}`);
+      } else {
+        const action = existingProfile ? "update" : "create";
+        alert(
+          `Failed to ${action} profile and generate QR code. Please try again.`
+        );
+      }
     }
   };
 
@@ -156,15 +355,76 @@ const MainQr = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-4">
-            Create Your
+            {existingProfile ? "Update Your" : "Create Your"}
             <br />
             <span className="text-primary bg-gradient-to-r from-primary to-secondary bg-clip-text">
               Personal QR Code
             </span>
           </h1>
           <p className="text-lg text-base-content/70">
-            Fill in your information to generate a personalized QR code
+            {existingProfile
+              ? "Update your information to regenerate your personalized QR code"
+              : "Fill in your information to generate a personalized QR code"}
           </p>
+          {existingProfile && (
+            <div className="mt-2 flex items-center justify-center gap-2">
+              <svg
+                className="w-4 h-4 text-success"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span className="text-sm text-success font-medium">
+                Profile loaded • Created:{" "}
+                {new Date(existingProfile.createdAt).toLocaleDateString()}
+              </span>
+              {currentDataChanged && (
+                <span className="badge badge-warning badge-sm ml-2">
+                  <svg
+                    className="w-3 h-3 mr-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.314 16.5c-.77.833.192 2.5 1.732 2.5z"
+                    />
+                  </svg>
+                  Changes detected
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={refreshProfile}
+                className="btn btn-ghost btn-xs"
+                title="Refresh Profile"
+              >
+                <svg
+                  className="w-3 h-3"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Main Form Card */}
@@ -205,38 +465,6 @@ const MainQr = () => {
                         )}
                       </div>
                     </div>
-
-                    {/* Upload Button */}
-                    <div className="relative">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        id="photo-upload"
-                        {...register("photo", {
-                          onChange: handlePhotoChange,
-                        })}
-                      />
-                      <label
-                        htmlFor="photo-upload"
-                        className="btn btn-outline btn-primary btn-sm cursor-pointer"
-                      >
-                        <svg
-                          className="w-4 h-4 mr-2"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                          />
-                        </svg>
-                        Upload Photo
-                      </label>
-                    </div>
                   </div>
                 </div>
 
@@ -246,18 +474,17 @@ const MainQr = () => {
                   <div className="form-control">
                     <label className="label">
                       <span className="label-text font-medium">
-                        Full Name *
+                        Full Name
                       </span>
                     </label>
                     <div className="relative">
                       <input
                         type="text"
-                        placeholder="Enter your full name"
+                        placeholder="Enter your full name (optional)"
                         className={`input input-bordered w-full pl-12 focus:input-primary ${
                           errors.name ? "input-error" : ""
                         }`}
                         {...register("name", {
-                          required: "Full name is required",
                           minLength: {
                             value: 2,
                             message: "Name must be at least 2 characters",
@@ -290,17 +517,16 @@ const MainQr = () => {
                   {/* Email */}
                   <div className="form-control">
                     <label className="label">
-                      <span className="label-text font-medium">Email *</span>
+                      <span className="label-text font-medium">Email</span>
                     </label>
                     <div className="relative">
                       <input
                         type="email"
-                        placeholder="Enter your email address"
+                        placeholder="Enter your email address (optional)"
                         className={`input input-bordered w-full pl-12 focus:input-primary ${
                           errors.email ? "input-error" : ""
                         }`}
                         {...register("email", {
-                          required: "Email is required",
                           pattern: {
                             value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                             message: "Please enter a valid email address",
@@ -335,18 +561,17 @@ const MainQr = () => {
                 <div className="form-control">
                   <label className="label">
                     <span className="label-text font-medium">
-                      Phone Number *
+                      Phone Number
                     </span>
                   </label>
                   <div className="relative">
                     <input
                       type="tel"
-                      placeholder="Enter your phone number"
+                      placeholder="Enter your phone number (optional)"
                       className={`input input-bordered w-full pl-12 focus:input-primary ${
                         errors.phone ? "input-error" : ""
                       }`}
                       {...register("phone", {
-                        required: "Phone number is required",
                         pattern: {
                           value: /^[+]?[(]?\d{10,15}$/,
                           message: "Please enter a valid phone number",
@@ -382,7 +607,7 @@ const MainQr = () => {
                   <div className="form-control">
                     <label className="label">
                       <span className="label-text font-medium">
-                        Mother's Name
+                        Mother's Name *
                       </span>
                     </label>
                     <div className="relative">
@@ -393,6 +618,7 @@ const MainQr = () => {
                           errors.motherName ? "input-error" : ""
                         }`}
                         {...register("motherName", {
+                          required: "Mother's name is required",
                           minLength: {
                             value: 2,
                             message: "Name must be at least 2 characters",
@@ -426,7 +652,7 @@ const MainQr = () => {
                   <div className="form-control">
                     <label className="label">
                       <span className="label-text font-medium">
-                        Father's Name
+                        Father's Name *
                       </span>
                     </label>
                     <div className="relative">
@@ -437,6 +663,7 @@ const MainQr = () => {
                           errors.fatherName ? "input-error" : ""
                         }`}
                         {...register("fatherName", {
+                          required: "Father's name is required",
                           minLength: {
                             value: 2,
                             message: "Name must be at least 2 characters",
@@ -522,16 +749,21 @@ const MainQr = () => {
                               type="text"
                               placeholder="Enter contact name"
                               className={`input input-bordered w-full pl-10 focus:input-primary ${
-                                errors.contacts?.[index]?.name
+                                errors.contacts?.[index]?.contactPersonName
                                   ? "input-error"
                                   : ""
                               }`}
-                              {...register(`contacts.${index}.name` as const, {
-                                minLength: {
-                                  value: 2,
-                                  message: "Name must be at least 2 characters",
-                                },
-                              })}
+                              {...register(
+                                `contacts.${index}.contactPersonName` as const,
+                                {
+                                  required: "Contact name is required",
+                                  minLength: {
+                                    value: 2,
+                                    message:
+                                      "Name must be at least 2 characters",
+                                  },
+                                }
+                              )}
                             />
                             <svg
                               className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-base-content/50"
@@ -547,10 +779,13 @@ const MainQr = () => {
                               />
                             </svg>
                           </div>
-                          {errors.contacts?.[index]?.name && (
+                          {errors.contacts?.[index]?.contactPersonName && (
                             <label className="label">
                               <span className="label-text-alt text-error">
-                                {errors.contacts[index]?.name?.message}
+                                {
+                                  errors.contacts[index]?.contactPersonName
+                                    ?.message
+                                }
                               </span>
                             </label>
                           )}
@@ -568,12 +803,12 @@ const MainQr = () => {
                               type="tel"
                               placeholder="Enter phone number"
                               className={`input input-bordered w-full pl-10 focus:input-primary ${
-                                errors.contacts?.[index]?.number
+                                errors.contacts?.[index]?.contactPersonNumber
                                   ? "input-error"
                                   : ""
                               }`}
                               {...register(
-                                `contacts.${index}.number` as const,
+                                `contacts.${index}.contactPersonNumber` as const,
                                 {
                                   pattern: {
                                     value: /^[+]?[(]?\d{10,15}$/,
@@ -597,10 +832,13 @@ const MainQr = () => {
                               />
                             </svg>
                           </div>
-                          {errors.contacts?.[index]?.number && (
+                          {errors.contacts?.[index]?.contactPersonNumber && (
                             <label className="label">
                               <span className="label-text-alt text-error">
-                                {errors.contacts[index]?.number?.message}
+                                {
+                                  errors.contacts[index]?.contactPersonNumber
+                                    ?.message
+                                }
                               </span>
                             </label>
                           )}
@@ -666,12 +904,20 @@ const MainQr = () => {
                   className={`btn btn-primary flex-1 order-1 sm:order-2 ${
                     isLoading ? "loading" : ""
                   }`}
-                  disabled={isLoading || !isValid}
+                  disabled={
+                    isLoading || 
+                    !watchedMotherName?.trim() || 
+                    !watchedFatherName?.trim()
+                  }
                 >
                   {isLoading ? (
                     <>
                       <span className="loading loading-spinner loading-sm"></span>
-                      Generating QR Code...
+                      {existingProfile && currentDataChanged
+                        ? "Updating Profile..."
+                        : existingProfile
+                          ? "Generating QR Code..."
+                          : "Creating Profile..."}
                     </>
                   ) : (
                     <>
@@ -688,7 +934,11 @@ const MainQr = () => {
                           d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                         />
                       </svg>
-                      Generate QR Code
+                      {existingProfile && currentDataChanged
+                        ? "Update & Generate QR Code"
+                        : existingProfile
+                          ? "Generate QR Code"
+                          : "Create Profile & Generate QR Code"}
                     </>
                   )}
                 </button>

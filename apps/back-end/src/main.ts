@@ -9,7 +9,7 @@ async function bootstrap() {
   app.use(cookieParser(process.env.PARSER_SECRET));
 
   app.enableCors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+    origin: process.env.CORS_ORIGIN || 'http://localhost:4321',
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type, Accept, Authorization, X-Requested-With',
@@ -22,11 +22,6 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
-
-  app.enableCors({
-    origin: ['http://localhost:4321', 'http://localhost:5173'],
-    credentials: true,
-  });
 
   await app.listen(process.env.PORT ?? 3000);
   Logger.log('app is listening on port', process.env.PORT ?? 3000);

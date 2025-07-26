@@ -1,18 +1,18 @@
 import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
-import { WhatsappConsumer } from './whatsapp-queue.consumers';
 import { MailConsumer } from './mail-queue.consumer';
+import { SmsConsumer } from './sms-queue.consumer';
 
 @Module({
     imports: [
         BullModule.registerQueue({
-            name: "whatsapp-queue",
+            name: "email-queue",
         }),
         BullModule.registerQueue({
-            name: "email-queue",
-        })
+            name: "sms-queue",
+        }),
     ],
     exports: [BullModule],
-    providers: [WhatsappConsumer, MailConsumer]
+    providers: [MailConsumer, SmsConsumer]
 })
 export class MessageQueueModule { }
