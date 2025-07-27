@@ -1,0 +1,165 @@
+---
+import Layout from "@layouts/Layout.astro";
+import MetaTags from "@seo/meta.tags.astro";
+import { Icon } from "astro-icon/components";
+---
+
+<Layout>
+  <MetaTags
+    title="Contact Us - Personal QR"
+    description="Get in touch with the Personal QR team. We're here to help with any questions about our QR code solutions."
+  />
+
+  <!-- Hero Section -->
+  <section
+    class="bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10 py-16"
+  >
+    <div class="container mx-auto px-4 max-w-6xl">
+      <div class="text-center">
+        <!-- Badge -->
+        <div class="badge badge-primary badge-lg px-6 py-3 mb-6">
+          ✨ We're Here to Help
+        </div>
+
+        <!-- Main Headline -->
+        <h1 class="text-4xl md:text-6xl font-bold mb-6">
+          Get in
+          <span
+            class="text-primary bg-gradient-to-r from-primary to-secondary bg-clip-text"
+          >
+            Touch
+          </span>
+        </h1>
+
+        <!-- Subtitle -->
+        <p class="md:text-lg text-base-content/80 max-w-2xl mx-auto">
+          Have questions about Personal QR? Need help with your QR codes? We're
+          here to assist you with any inquiries or support needs.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Options Section -->
+  <section class="py-16 bg-base-100">
+    <div class="container mx-auto px-4 max-w-6xl">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">
+          Multiple Ways to Reach Us
+        </h2>
+        <p class="text-lg text-base-content/70 max-w-2xl mx-auto">
+          Choose the method that works best for you. We aim to respond to all
+          inquiries within 24 hours.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Email -->
+        <div
+          class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300"
+        >
+          <div class="card-body items-center text-center">
+            <div
+              class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6"
+            >
+              <Icon name="lucide:mail" size={32} class="text-primary" />
+            </div>
+            <h3 class="font-bold text-xl mb-2">Email Us</h3>
+            <p class="text-base-content/70 mb-4">
+              For general inquiries and support
+            </p>
+            <a
+              href="mailto:info@prqr.in"
+              class="text-primary font-medium hover:underline text-lg"
+            >
+              info@prqr.in
+            </a>
+            <div class="mt-4">
+              <div class="badge badge-outline">Response within 24hrs</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phone -->
+        <div
+          class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300"
+        >
+          <div class="card-body items-center text-center">
+            <div
+              class="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center mb-6"
+            >
+              <Icon name="lucide:phone" size={32} class="text-secondary" />
+            </div>
+            <h3 class="font-bold text-xl mb-2">Call Us</h3>
+            <p class="text-base-content/70 mb-4">
+              Monday to Friday, 9am-5pm PST
+            </p>
+            <a
+              href="tel:+919203333578"
+              class="text-secondary font-medium hover:underline text-lg"
+            >
+              +91 92033 33578
+            </a>
+            <div class="mt-4">
+              <div class="badge badge-outline">Business hours only</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Office -->
+        <div
+          class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300"
+        >
+          <div class="card-body items-center text-center">
+            <div
+              class="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mb-6"
+            >
+              <Icon name="lucide:map-pin" size={32} class="text-accent" />
+            </div>
+            <h3 class="font-bold text-xl mb-2">Visit Us</h3>
+            <p class="text-base-content/70 mb-4">Our headquarters location</p>
+            <p class="text-accent font-medium text-lg text-center">
+              20, SUBHASH NAGAR<br />
+              KHANDWA, 450001
+            </p>
+            <div class="mt-4">
+              <div class="badge badge-outline">By appointment</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Emergency Contact Section -->
+  <section
+    class="py-16 bg-gradient-to-br from-error/10 via-warning/5 to-primary/10"
+  >
+    <div class="container mx-auto px-4 max-w-4xl">
+      <div class="card bg-base-100 shadow-xl border border-error/20">
+        <div class="card-body text-center p-8">
+          <div
+            class="w-16 h-16 rounded-full bg-error/10 flex items-center justify-center mx-auto mb-6"
+          >
+            <Icon name="lucide:shield-alert" size={32} class="text-error" />
+          </div>
+          <h2 class="text-2xl font-bold mb-4">Emergency Support</h2>
+          <p class="text-base-content/70 mb-6">
+            For urgent technical issues or emergency situations related to your
+            QR codes, contact our emergency support line available 24/7.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="tel:+919203333578" class="btn btn-error">
+              <Icon name="lucide:phone" size={20} class="mr-2" />
+              Emergency Line
+            </a>
+            <a href="mailto:info@prqr.in" class="btn btn-outline btn-error">
+              <Icon name="lucide:mail" size={20} class="mr-2" />
+              Emergency Email
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

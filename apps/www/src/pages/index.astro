@@ -6,6 +6,7 @@ import { Icon } from "astro-icon/components";
 
 <Layout>
   <MetaTags />
+  
   <!-- Hero section -->
   <section
     class="bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10"
@@ -13,9 +14,9 @@ import { Icon } from "astro-icon/components";
     <div class="text-center">
       <div>
         <!-- Badge -->
-        <div class="badge badge-primary badge-lg px-6 py-3 mt-10 mb-20"
-          >✨ Two Types of QR Codes Available</div
-        >
+        <div class="badge badge-primary badge-lg px-6 py-3 mt-10 mb-20">
+          ✨ Two Types of QR Codes Available
+        </div>
 
         <!-- Main Headline -->
         <h1 class="text-4xl md:text-6xl font-bold mb-2">
@@ -41,11 +42,11 @@ import { Icon } from "astro-icon/components";
         >
           <button class="btn btn-primary w-full max-w-xs">
             <Icon name="lucide:user" size={24} />
-            <span>Create Profile QR</span>
+            <a href="/home/qr">Create Profile QR</a>
           </button>
           <button class="btn btn-error w-full max-w-xs">
             <Icon name="lucide:shield-alert" size={24} />
-            <span> Create Emergency QR </span>
+            <a href="/auth/signinpage"> Create Emergency QR </a>
           </button>
         </div>
 
@@ -56,12 +57,14 @@ import { Icon } from "astro-icon/components";
               <Icon name="lucide:shield-check" class="w-6 h-6 sm:w-8 sm:h-8" />
             </div>
             <div class="stat-title text-xs sm:text-sm">Security</div>
-            <div class="stat-value text-primary text-lg sm:text-2xl lg:text-3xl"
-              >Secured</div
+            <div
+              class="stat-value text-primary text-lg sm:text-2xl lg:text-3xl"
             >
-            <div class="stat-desc text-xs hidden sm:block"
-              >End-to-end encrypted</div
-            >
+              Secured
+            </div>
+            <div class="stat-desc text-xs hidden sm:block">
+              End-to-end encrypted
+            </div>
           </div>
           <div class="stat">
             <div class="stat-figure text-secondary">
@@ -70,10 +73,12 @@ import { Icon } from "astro-icon/components";
             <div class="stat-title text-xs sm:text-sm">Support</div>
             <div
               class="stat-value text-secondary text-lg sm:text-2xl lg:text-3xl"
-              >24/7</div
             >
-            <div class="stat-desc text-xs hidden sm:block">Always available</div
-            >
+              24/7
+            </div>
+            <div class="stat-desc text-xs hidden sm:block">
+              Always available
+            </div>
           </div>
         </div>
       </div>
@@ -233,3 +238,32 @@ import { Icon } from "astro-icon/components";
     </div>
   </section>
 </Layout>
+
+<script>
+  // Simple auth verification check
+  async function checkAuthAndVerification() {
+    try {
+      // Use the same endpoint as in useAuth hook
+      const response = await fetch('/auth/verify', {
+        method: 'GET',
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Auth verification response:', data);
+        
+        // Check if user has valid ID but is not verified
+        if (data.id && (!data.isNumberVerified && !data.isEmailVerified)) {
+          console.log('User is not verified (both fields false), redirecting to signin page');
+          window.location.href = '/auth/signinpage';
+        }
+      }
+    } catch (error) {
+      console.error('Auth check failed:', error);
+    }
+  }
+
+  // Run auth check when page loads
+  document.addEventListener('DOMContentLoaded', checkAuthAndVerification);
+</script>
